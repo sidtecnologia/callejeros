@@ -121,6 +121,7 @@ export const ShopProvider = ({ children }) => {
     return {
       name: customerData.name,
       address: customerData.address,
+      phone: customerData.phone,
       payment: customerData.payment,
       items: cart,
       total,
@@ -133,6 +134,7 @@ export const ShopProvider = ({ children }) => {
       const dbOrder = {
         customer_name: orderDetails.name,
         customer_address: orderDetails.address,
+        phone: String(orderDetails.phone || ''),
         payment_method: orderDetails.payment,
         total_amount: orderDetails.total,
         order_items: orderDetails.items,
@@ -140,14 +142,27 @@ export const ShopProvider = ({ children }) => {
         order_status: 'Pendiente'
       };
 
+      // 1. Guardar en base de datos (Supabase)
       await saveOrderToDB(dbOrder);
-      await placeOrderAPI(orderDetails, products);
+
+      // 2. Intentar notificación externa (opcional)
+      try {
+        if (typeof placeOrderAPI === 'function') {
+          await placeOrderAPI(orderDetails, products);
+        }
+      } catch (apiErr) {
+        // Solo registramos el error de la API sin detener el flujo principal
+        console.warn("La notificación externa falló, pero el pedido se guardó:", apiErr);
+      }
+
+      // 3. Finalizar proceso exitoso
       await fetchProducts();
       clearCart();
       addToast('Pedido confirmado y enviado correctamente.', 'Pedido enviado');
 
       return true;
     } catch (err) {
+      console.error("Error crítico al procesar pedido:", err);
       addToast('Error al confirmar el pedido: ' + (err.message || err), 'Error');
       throw err;
     }
