@@ -51,20 +51,16 @@ const StoreContent = () => {
   const [successOrder, setSuccessOrder] = useState(null);
 
   useEffect(() => {
-    const pendingId = localStorage.getItem('pending_product_id');
-    if (pendingId) {
-      const attemptOpen = () => {
-        const element = document.getElementById(`product-trigger-${pendingId}`);
-        if (element) {
-          element.click();
-          localStorage.removeItem('pending_product_id');
-          return true;
+    if (products.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('p');
+
+      if (productId) {
+        const targetProduct = products.find(p => String(p.id) === String(productId));
+        if (targetProduct) {
+          setActiveProduct(targetProduct);
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
-        return false;
-      };
-      if (!attemptOpen()) {
-        setTimeout(attemptOpen, 800);
-        setTimeout(attemptOpen, 2000);
       }
     }
   }, [products]);
@@ -85,14 +81,14 @@ const StoreContent = () => {
   const featuredBase = useMemo(() => products.filter(p => p.featured), [products]);
   const [featured, setFeatured] = useState(() => shuffleArray(featuredBase));
 
-  useMemo(() => {
+  useEffect(() => {
     setFeatured(shuffleArray(featuredBase));
-  }, [products.length]);
+  }, [featuredBase]);
 
   const handleSelectCategory = (cat) => {
     setSelectedCategory(cat);
     if (cat === 'Todo') {
-      setFeatured(prev => shuffleArray(featuredBase));
+      setFeatured(shuffleArray(featuredBase));
     }
   };
 
@@ -142,9 +138,7 @@ const StoreContent = () => {
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {featured.map(p => (
-                      <div key={p.id} id={`product-trigger-${p.id}`} onClick={() => setActiveProduct(p)} className="cursor-pointer">
-                        <ProductCard product={p} onClick={setActiveProduct} />
-                      </div>
+                      <ProductCard key={p.id} product={p} onClick={setActiveProduct} />
                     ))}
                   </div>
                 </section>
@@ -158,9 +152,7 @@ const StoreContent = () => {
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {offers.map(p => (
-                      <div key={p.id} id={`product-trigger-${p.id}`} onClick={() => setActiveProduct(p)} className="cursor-pointer">
-                        <ProductCard product={p} onClick={setActiveProduct} />
-                      </div>
+                      <ProductCard key={p.id} product={p} onClick={setActiveProduct} />
                     ))}
                   </div>
                 </section>
@@ -174,9 +166,7 @@ const StoreContent = () => {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {filteredProducts.map(p => (
-                    <div key={p.id} id={`product-trigger-${p.id}`} onClick={() => setActiveProduct(p)} className="cursor-pointer">
-                      <ProductCard product={p} onClick={setActiveProduct} />
-                    </div>
+                    <ProductCard key={p.id} product={p} onClick={setActiveProduct} />
                   ))}
                 </div>
               )}
