@@ -17,8 +17,8 @@ const BusinessModal = () => {
         </div>
         
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Comida Rápida</h2>
-          <p className="text-gray-500">La mejor comida de Bucaramanga.</p>
+          <h2 className="text-2xl font-bold text-gray-800">Callejero's</h2>
+          <p className="text-gray-500">La mejor comida de El Socorro.</p>
         </div>
 
         <div className="space-y-4 text-left bg-gray-50 p-4 rounded-xl">
@@ -26,8 +26,8 @@ const BusinessModal = () => {
             <MapPin className="text-primary mt-1" size={20} />
             <div>
               <p className="font-semibold">Dirección</p>
-              <a href="https://maps.google.com/?q=Carrera+27+%23+10-50+Bucaramanga" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                Carrera 27 # 10-50, Bucaramanga, Santander
+              <a href="https://maps.app.goo.gl/bSohh1rSfRBNmnPaA" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                Cra. 12 #8 sur 128, Socorro, Santander
               </a>
             </div>
           </div>
@@ -36,7 +36,7 @@ const BusinessModal = () => {
             <Clock className="text-primary mt-1" size={20} />
             <div>
               <p className="font-semibold">Horario</p>
-              <p className="text-gray-600">Lun - Dom: 17:00 - 23:00</p>
+              <p className="text-gray-600">Lun - Dom: 11:00 - 23:00</p>
             </div>
           </div>
 
@@ -44,7 +44,7 @@ const BusinessModal = () => {
             <Phone className="text-primary mt-1" size={20} />
             <div>
               <p className="font-semibold">Contacto</p>
-              <a href="tel:+573227671829" className="text-gray-600 hover:text-primary">+57 322 767 1829</a>
+              <a href="tel:+3113366866" className="text-gray-600 hover:text-primary">+57 311 336 6866</a>
             </div>
           </div>
         </div>
