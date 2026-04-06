@@ -9,9 +9,9 @@ const StoreStatusBanner = () => {
           <Clock size={20} />
         </div>
         <div>
-          <p className="font-bold text-sm text-left">Regresa Mañana</p>
+          <p className="font-bold text-sm text-left">¡Abriremos Pronto!</p>
           <p className="text-xs text-left">
-            Nuestro horario es de {BUSINESS_CONFIG.schedule.label}. Puedes ver nuestros productos si deseas.
+            Nuestro horario es de {BUSINESS_CONFIG.schedule.label}. Puedes ver nuestros productos si lo deseas.
           </p>
         </div>
       </div>
