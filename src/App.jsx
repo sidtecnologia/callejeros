@@ -10,7 +10,7 @@ import BusinessModal from './components/BusinessModal';
 import InstallPrompt from './components/InstallPrompt';
 import BannerCarousel from './components/BannerCarousel';
 import Toasts from './components/Toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info } from 'lucide-react';
 
 const shuffleArray = (arr) => {
   const copy = [...arr];
@@ -42,7 +42,7 @@ const Categories = ({ categories, selected, onSelect }) => (
 );
 
 const StoreContent = () => {
-  const { products, loading, error } = useShop();
+  const { products, loading, error, setBusinessModalOpen } = useShop();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todo');
   const [activeProduct, setActiveProduct] = useState(null);
@@ -72,7 +72,11 @@ const StoreContent = () => {
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase().trim();
+      const matchesSearch = !searchLower || 
+        p.name.toLowerCase().includes(searchLower) || 
+        (p.description && p.description.toLowerCase().includes(searchLower)) ||
+        (p.category && p.category.toLowerCase().includes(searchLower));
       const matchesCategory = selectedCategory === 'Todo' || p.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
@@ -175,6 +179,13 @@ const StoreContent = () => {
       </main>
 
       <footer className="bg-white border-t mt-8 py-6 text-center text-gray-500 text-xs">
+        <button
+          onClick={() => setBusinessModalOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 mb-3 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
+        >
+          <Info size={16} />
+          <span className="font-medium">Ver información del negocio</span>
+        </button>
         <p>&copy; {new Date().getFullYear()} TECSIN. Todos los derechos reservados.</p>
       </footer>
 
