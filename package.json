@@ -1,5 +1,5 @@
 {
-  "name": "comida-rapida-pwa",
+  "name": "big-burguers-pwa",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -24,14 +24,14 @@
   "main": "eslint.config.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sidtecnologia/callejeros.git"
+    "url": "git+https://github.com/tecnologiasid/burguers20.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/sidtecnologia/callejeros/issues"
+    "url": "https://github.com/tecnologiasid/burguers20/issues"
   },
-  "homepage": "https://github.com/sidtecnologia/callejeros#readme"
+  "homepage": "https://github.com/tecnologiasid/burguers20#readme"
 }

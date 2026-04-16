@@ -1,13 +1,13 @@
 export const BUSINESS_CONFIG = {
-  name: "Comida Rápida",
-  phone: "311 336 6866",
-  phoneRaw: "3113366866",
-  address: "Cra. 12 #8 sur 128, Socorro, Santander",
-  mapsUrl: "https://maps.google.com/?q=Cra.12+#8+sur+128,+Socorro,+Santander",
+  name: "Big Burguer's La 20",
+  phone: "3124934400",
+  phoneRaw: "3124934400",
+  address: "Cll 20 # 8-40, Socorro, Santander",
+  mapsUrl: "https://maps.app.goo.gl/BQfa8F9DhFvJvbEd6",
   schedule: {
-    label: "Lun - Dom: 2:00 pm - 11:00 pm",
-    openHour: 0,
-    closeHour: 24,
+    label: "Lun Mier Juev Vie Dom: 6pm a 11pm",
+    openHour: 18,
+    closeHour: 23,
     timezone: "America/Bogota"
   }
 };

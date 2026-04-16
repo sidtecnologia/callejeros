@@ -26,7 +26,7 @@ const Navbar = ({ onSearch, onOpenCart }) => {
             <img src="/img/favicon.png" alt="Logo" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
           </div>
           <h1 className="text-xl font-bold text-gray-800 hidden md:block">
-            Comida Rápida
+            Big Burguer's La 20
           </h1>
         </div>
 
