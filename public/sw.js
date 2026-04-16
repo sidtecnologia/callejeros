@@ -61,7 +61,7 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notificación', body: event.data ? event.data.text() : 'Tienes una nueva notificación' };
   }
 
-  const title = payload.title || 'Comida Rápida';
+  const title = payload.title || 'Big Burguers la 20';
   const options = {
     body: payload.body || '',
     icon: payload.icon || '/img/favicon.png',
