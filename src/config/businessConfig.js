@@ -13,13 +13,14 @@ export const BUSINESS_CONFIG = {
     cost: 4000
   },
   banners: [
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner4.webp'
+    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
+    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
+    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
+    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner4.webp',
+    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner5.webp'
   ],
   schedule: {
-    label: "Sábado- Domingo 12m a 4pm",
+    label: "Sábado - Domingo 12m a 4pm",
     openHour: 12,
     closeHour: 16,
     timezone: "America/Bogota"
