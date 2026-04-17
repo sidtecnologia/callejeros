@@ -1,21 +1,21 @@
 {
-  "name": "Big Burguer's la 20",
-  "short_name": "BigBurguers",
+  "name": "El Patio Restaurante",
+  "short_name": "PatioRestaurante",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563EB",
-  "description": "Pide las mejores hamburguesas y perros calientes",
+  "description": "Pide la mejor comida de nuestro municipio",
   "icons": [
     {
-      "src": "/img/favicon.png",
+      "src": "img/favicon.png",
       "sizes": "320x320",
-      "type": "/img/png"
+      "type": "img/png"
     },
     {
-      "src": "/img/favicon.png",
+      "src": "img/favicon.png",
       "sizes": "512x512",
-      "type": "/img/png"
+      "type": "img/png"
     }
   ]
 }

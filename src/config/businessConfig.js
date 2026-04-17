@@ -1,13 +1,27 @@
 export const BUSINESS_CONFIG = {
-  name: "Big Burguer's La 20",
-  phone: "3124934400",
-  phoneRaw: "3124934400",
-  address: "Cll 20 # 8-40, Socorro, Santander",
-  mapsUrl: "https://maps.app.goo.gl/BQfa8F9DhFvJvbEd6",
+  name: "El Patio Restaurante",
+  phone: "3163305837",
+  phoneRaw: "3163305837",
+  address: "Cll 12 # 12-25, Socorro, Santander",
+  mapsUrl: "https://maps.app.goo.gl/7ePK8P6ruei75bde6",
+  whatsapp: "573163305837",
+  nequi: {
+    number: "3227671829",
+    qrUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png"
+  },
+  delivery: {
+    cost: 4000
+  },
+  banners: [
+    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
+    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
+    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
+    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner4.webp'
+  ],
   schedule: {
-    label: "Lun Mier Juev Vie Dom: 6pm a 11pm",
-    openHour: 18,
-    closeHour: 23,
+    label: "Sábado- Domingo 12m a 4pm",
+    openHour: 12,
+    closeHour: 16,
     timezone: "America/Bogota"
   }
 };

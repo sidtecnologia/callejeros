@@ -3,8 +3,7 @@ import Modal from './ui/Modal';
 import { CheckCircle } from 'lucide-react';
 import { formatMoney } from '../utils/format';
 import { useShop } from '../context/ShopContext';
-
-const WHATSAPP_NUMBER = '573227671829';
+import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
   const { confirmOrder, addToast } = useShop();
@@ -49,8 +48,8 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
   const handleCash = async () => {
     const encoded = encodeURIComponent(buildCashMessage());
     const link = isMobile()
-      ? `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${encoded}`
-      : `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
+      ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
+      : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
     window.open(link, '_blank', 'noopener,noreferrer');
     await finishOrder();
   };

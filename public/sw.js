@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'bigburguers-cache-v1.0.1'
+const CACHE_NAME = 'patiorestaurante-cache-v1.0.0'
 const ASSETS = [
   '/',
   '/index.html',
@@ -61,11 +61,11 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notificación', body: event.data ? event.data.text() : 'Tienes una nueva notificación' };
   }
 
-  const title = payload.title || 'Big Burguers la 20';
+  const title = payload.title || 'El Patio Restaurante';
   const options = {
     body: payload.body || '',
-    icon: payload.icon || '/img/favicon.png',
-    badge: payload.badge || '/img/favicon.png',
+    icon: payload.icon || 'img/favicon.png',
+    badge: payload.badge || 'img/favicon.png',
     data: payload.data || {}
   };
 

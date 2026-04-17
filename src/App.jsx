@@ -12,6 +12,7 @@ import BannerCarousel from './components/BannerCarousel';
 import ExitConfirmDialog from './components/ExitConfirmDialog';
 import Toasts from './components/Toast';
 import StoreStatusBanner from './components/StoreStatusBanner';
+import { BUSINESS_CONFIG } from './config/businessConfig';
 import { useStoreHours } from './hooks/useStoreHours';
 import { Loader2, Info } from 'lucide-react';
 
@@ -134,13 +135,7 @@ const StoreContent = () => {
 
   const showSections = searchTerm === '' && selectedCategory === 'Todo';
 
-  const banners = [
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
-    'https://hxcpjasptqnnkypspmdg.supabase.co/storage/v1/object/public/images/baner/baner4.webp'
-
-  ];
+  <BannerCarousel images={BUSINESS_CONFIG.banners} speed={48} />
 
   return (
     <div className="min-h-screen pb-20">
@@ -149,7 +144,7 @@ const StoreContent = () => {
       <main className="max-w-6xl mx-auto px-3 py-4">
         {!isStoreOpen && <StoreStatusBanner />}
 
-        <BannerCarousel images={banners} speed={48} />
+        <BannerCarousel images={BUSINESS_CONFIG.banners} speed={48} />
 
         <Categories
           categories={categories}
