@@ -7,7 +7,7 @@ export const PrivacyContent = () => {
         1. Responsable del Tratamiento de Datos
         </h2>
         <p className="mb-4">
-        El responsable del tratamiento de sus datos personales es <strong>El Patio Restaurante</strong>, con domicilio en El Socorro, Santander, Colombia. Para cualquier consulta, contáctenos en: <span className="text-blue-600 underline">tu_correo@ejemplo.com</span>.
+        El responsable del tratamiento de sus datos personales es <strong>El Fogón Socorrano</strong>, con domicilio en El Socorro, Santander, Colombia. Para cualquier consulta, contáctenos en: <span className="text-blue-600 underline">tu_correo@ejemplo.com</span>.
         </p>
 
         <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">

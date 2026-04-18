@@ -1,10 +1,10 @@
 export const BUSINESS_CONFIG = {
-  name: "El Patio Restaurante",
-  phone: "3163305837",
-  phoneRaw: "3163305837",
-  address: "Cll 12 # 12-25, Socorro, Santander",
-  mapsUrl: "https://maps.app.goo.gl/7ePK8P6ruei75bde6",
-  whatsapp: "573163305837",
+  name: "Fogón Socorrano",
+  phone: "3153395330",
+  phoneRaw: "3153395330",
+  address: "Cra 14 # 4-17, Socorro, Santander",
+  mapsUrl: "https://maps.app.goo.gl/VZ5SYTrJcCkVnxy4A",
+  whatsapp: "573153395330",
   nequi: {
     number: "3227671829",
     qrUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png"
@@ -13,16 +13,16 @@ export const BUSINESS_CONFIG = {
     cost: 4000
   },
   banners: [
-    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
-    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
-    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
-    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner4.webp',
-    'https://vpycbxrjihahlgwajpkz.supabase.co/storage/v1/object/public/images/baner/baner5.webp'
+    'https://lzwkjqentsuvfuehhcka.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
+    'https://lzwkjqentsuvfuehhcka.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
+    'https://lzwkjqentsuvfuehhcka.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
+    'https://lzwkjqentsuvfuehhcka.supabase.co/storage/v1/object/public/images/baner/baner4.webp',
+    'https://lzwkjqentsuvfuehhcka.supabase.co/storage/v1/object/public/images/baner/baner5.webp'
   ],
   schedule: {
-    label: "Sábado - Domingo 12m a 4pm",
-    openHour: 12,
-    closeHour: 16,
+    label: "Lunes - Domingo 6am a 5pm",
+    openHour: 6,
+    closeHour: 17,
     timezone: "America/Bogota"
   }
 };

@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'patiorestaurante-cache-v1.0.0'
+const CACHE_NAME = 'fogonsocorrano-cache-v1.0.0'
 const ASSETS = [
   '/',
   '/index.html',
@@ -61,7 +61,7 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notificación', body: event.data ? event.data.text() : 'Tienes una nueva notificación' };
   }
 
-  const title = payload.title || 'El Patio Restaurante';
+  const title = payload.title || 'El Fogón Socorrano';
   const options = {
     body: payload.body || '',
     icon: payload.icon || 'img/favicon.png',
