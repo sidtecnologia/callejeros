@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getProducts, placeOrderAPI } from '../services/api';
+import { getProducts, validateOrderAPI, saveOrderToDB } from '../services/api';
 
 const ShopContext = createContext();
 
@@ -113,7 +113,6 @@ export const ShopProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   const processOrder = async (customerData) => {
-    const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
     const itemObservations = cart
       .map((i) => (i.observation && i.observation.trim() ? i.observation.trim() : null))
       .filter(Boolean);
@@ -121,11 +120,12 @@ export const ShopProvider = ({ children }) => {
     const aggregatedObservation =
       itemObservations.length > 0 ? itemObservations.join(' | ') : '';
 
-    const orderDetails = {
+    const orderPayload = {
       name: customerData.name,
       address: customerData.address,
       phone: customerData.phone,
       payment: customerData.payment,
+      observation: aggregatedObservation,
       items: cart.map((item) => ({
         id: item.id,
         name: item.name,
@@ -133,17 +133,38 @@ export const ShopProvider = ({ children }) => {
         qty: item.qty,
         observation: item.observation || '',
       })),
-      total,
-      observation: aggregatedObservation,
     };
 
-    const result = await placeOrderAPI(orderDetails);
+    const result = await validateOrderAPI(orderPayload);
 
+    return {
+      name: result.customerData.name,
+      address: result.customerData.address,
+      phone: result.customerData.phone,
+      payment: result.customerData.payment,
+      observation: result.customerData.observation || '',
+      items: result.validatedItems,
+      total: result.total,
+    };
+  };
+
+  const confirmOrder = async (orderDetails) => {
+    const dbOrder = {
+      customer_name: orderDetails.name,
+      customer_address: orderDetails.address,
+      phone: String(orderDetails.phone || ''),
+      payment_method: orderDetails.payment,
+      total_amount: orderDetails.total,
+      order_items: orderDetails.items,
+      observation: orderDetails.observation || null,
+      order_status: 'Recibido',
+      payment_status: 'Pendiente',
+    };
+
+    await saveOrderToDB(dbOrder);
     await fetchProducts();
     clearCart();
     addToast('Pedido confirmado y enviado correctamente.', 'Pedido enviado');
-
-    return { ...orderDetails, orderId: result.orderId };
   };
 
   return (
@@ -158,6 +179,7 @@ export const ShopProvider = ({ children }) => {
         updateCartQty,
         clearCart,
         processOrder,
+        confirmOrder,
         isBusinessModalOpen,
         setBusinessModalOpen,
         toasts,

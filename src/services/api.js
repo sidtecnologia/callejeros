@@ -35,7 +35,7 @@ export const getProducts = async () => {
   return data;
 };
 
-export const placeOrderAPI = async (orderDetails) => {
+export const validateOrderAPI = async (orderDetails) => {
   let response;
 
   try {
@@ -59,5 +59,12 @@ export const placeOrderAPI = async (orderDetails) => {
     throw new Error(data?.error || `Error procesando la orden (${response.status})`);
   }
 
+  return data;
+};
+
+export const saveOrderToDB = async (orderData) => {
+  const supabase = await initSupabase();
+  const { data, error } = await supabase.from('orders').insert([orderData]).select();
+  if (error) throw error;
   return data;
 };

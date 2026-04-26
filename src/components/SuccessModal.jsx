@@ -6,7 +6,7 @@ import { useShop } from '../context/ShopContext';
 import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
-  const { addToast } = useShop();
+  const { confirmOrder, addToast } = useShop();
   const [loading, setLoading] = useState(false);
 
   if (!orderDetails) return null;
@@ -30,7 +30,7 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
     return lines.join('\n');
   };
 
-  const handleCash = () => {
+  const handleConfirm = async () => {
     setLoading(true);
     try {
       const encoded = encodeURIComponent(buildCashMessage());
@@ -39,8 +39,10 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
         : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
-      addToast('Pedido confirmado. Continúa en WhatsApp para finalizar el envío.', 'Pedido confirmado');
+      await confirmOrder(orderDetails);
       if (onClose) onClose();
+    } catch (err) {
+      addToast('No se pudo registrar el pedido. Por favor intenta de nuevo.', 'Error');
     } finally {
       setLoading(false);
     }
@@ -70,12 +72,12 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
         </div>
 
         <button
-          onClick={handleCash}
+          onClick={handleConfirm}
           disabled={loading}
           className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2"
         >
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" className="w-6 h-6" />
-          {loading ? 'Abriendo WhatsApp...' : 'Confirmar por WhatsApp'}
+          {loading ? 'Registrando pedido...' : 'Confirmar por WhatsApp'}
         </button>
 
         <button onClick={onClose} className="text-gray-400 text-sm hover:text-gray-600 underline">

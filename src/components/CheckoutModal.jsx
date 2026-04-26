@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Modal from './ui/Modal';
 import { useShop } from '../context/ShopContext';
 import PrivacyContent from '../utils/privacy';
-import { formatMoney } from '../utils/format';
 import ConfirmarPedidoYPagoModal from './ConfirmarPedidoYPagoModal';
 
 const sanitize = (value, max) => value.trim().slice(0, max).replace(/[<>]/g, '');
@@ -185,7 +184,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
             disabled={loading}
             className="w-full btn-primary py-3 text-lg flex justify-center"
           >
-            {loading ? 'Procesando...' : 'Confirmar Pedido'}
+            {loading ? 'Verificando...' : 'Continuar'}
           </button>
         </form>
       </Modal>

@@ -6,7 +6,7 @@ import { useShop } from '../context/ShopContext';
 import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
-  const { addToast } = useShop();
+  const { confirmOrder, addToast } = useShop();
   const [copied, setCopied] = useState(false);
   const [includeDelivery, setIncludeDelivery] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
     return lines.join('\n');
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setLoading(true);
     try {
       const encoded = encodeURIComponent(buildMessage());
@@ -61,8 +61,10 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
         : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
-      addToast('Pedido confirmado. Continúa en WhatsApp para finalizar el envío.', 'Pedido confirmado');
+      await confirmOrder(orderDetails);
       if (onClose) onClose();
+    } catch (err) {
+      addToast('No se pudo registrar el pedido. Por favor intenta de nuevo.', 'Error');
     } finally {
       setLoading(false);
     }
@@ -72,11 +74,11 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
     <Modal isOpen={isOpen} onClose={onClose} title="Pago por transferencia">
       <div className="space-y-5">
 
-        <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
-          <CheckCircle2 className="text-green-500 w-6 h-6 flex-shrink-0" />
+        <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
+          <CheckCircle2 className="text-yellow-500 w-6 h-6 flex-shrink-0" />
           <div>
-            <p className="font-semibold text-green-800 text-sm">¡Pedido registrado!</p>
-            <p className="text-green-600 text-xs">Ahora completa el pago para confirmar tu pedido.</p>
+            <p className="font-semibold text-yellow-800 text-sm">¡Pedido verificado!</p>
+            <p className="text-yellow-600 text-xs">Realiza la transferencia y envía el comprobante para confirmar.</p>
           </div>
         </div>
 
@@ -138,7 +140,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
           className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2"
         >
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" className="w-6 h-6" />
-          {loading ? 'Procesando...' : 'Enviar comprobante'}
+          {loading ? 'Registrando pedido...' : 'Enviar comprobante'}
         </button>
 
       </div>

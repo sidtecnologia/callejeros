@@ -143,35 +143,14 @@ export default async (req, res) => {
       });
     }
 
-    const { data: inserted, error: insertError } = await supabase
-      .from('orders')
-      .insert([{
-        customer_name: name,
-        customer_address: address,
-        phone,
-        payment_method: payment,
-        total_amount: computedTotal,
-        order_items: sanitizedItems,
-        observation: observation || null,
-        order_status: 'Recibido',
-        payment_status: 'Pendiente',
-      }])
-      .select('id')
-      .single();
-
-    if (insertError) {
-      console.error('Error al insertar la orden:', insertError.message);
-      return res.status(500).json({ error: 'Error al registrar la orden. Intenta de nuevo.' });
-    }
-
     return res.status(200).json({
       success: true,
-      message: 'Orden registrada con éxito.',
-      orderId: inserted.id,
       total: computedTotal,
+      validatedItems: sanitizedItems,
+      customerData: { name, address, phone, payment, observation: observation || null },
     });
   } catch (error) {
-    console.error('Error al procesar la orden:', error.message);
+    console.error('Error al validar la orden:', error.message);
     return res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };
