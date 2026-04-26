@@ -55,13 +55,14 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
   const handleConfirm = async () => {
     setLoading(true);
     try {
+      await confirmOrder(orderDetails);
+
       const encoded = encodeURIComponent(buildMessage());
       const link = isMobile()
         ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
         : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
-      await confirmOrder(orderDetails);
       if (onClose) onClose();
     } catch (err) {
       addToast('No se pudo registrar el pedido. Por favor intenta de nuevo.', 'Error');
@@ -73,7 +74,6 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Pago por transferencia">
       <div className="space-y-5">
-
         <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
           <CheckCircle2 className="text-yellow-500 w-6 h-6 flex-shrink-0" />
           <div>
@@ -142,7 +142,6 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" className="w-6 h-6" />
           {loading ? 'Registrando pedido...' : 'Enviar comprobante'}
         </button>
-
       </div>
     </Modal>
   );

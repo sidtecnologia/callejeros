@@ -33,13 +33,14 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
   const handleConfirm = async () => {
     setLoading(true);
     try {
+      await confirmOrder(orderDetails);
+
       const encoded = encodeURIComponent(buildCashMessage());
       const link = isMobile()
         ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
         : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
-      await confirmOrder(orderDetails);
       if (onClose) onClose();
     } catch (err) {
       addToast('No se pudo registrar el pedido. Por favor intenta de nuevo.', 'Error');
