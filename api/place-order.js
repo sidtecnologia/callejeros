@@ -54,7 +54,7 @@ export default async (req, res) => {
     return res.status(429).json({ error: 'Demasiadas solicitudes. Intenta en un momento.' });
   }
 
-  const supabaseUrl = process.env.SB_URL;
+  const supabaseUrl = process.env.VITE_SB_URL;
   const supabaseServiceRoleKey = process.env.SB_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
@@ -85,7 +85,7 @@ export default async (req, res) => {
       ? orderDetails.payment
       : null;
 
-    if (!name || !address || !phone || !payment) {
+    if (!name || name.length < 2 || !address || address.length < 3 || !phone || !payment) {
       return res.status(400).json({ error: 'Campos obligatorios inválidos o faltantes.' });
     }
 
@@ -111,8 +111,8 @@ export default async (req, res) => {
 
     const productMap = Object.fromEntries(dbProducts.map((p) => [String(p.id), p]));
 
-    const stockUpdates = [];
     let computedTotal = 0;
+    const sanitizedItems = [];
 
     for (const item of orderDetails.items) {
       const dbProduct = productMap[String(item.id)];
@@ -133,24 +133,41 @@ export default async (req, res) => {
       }
 
       computedTotal += dbProduct.price * qty;
-      stockUpdates.push({ id: dbProduct.id, newStock: dbProduct.stock - qty });
+
+      sanitizedItems.push({
+        id: dbProduct.id,
+        name: dbProduct.name,
+        price: dbProduct.price,
+        qty,
+        observation: sanitizeString(item.observation || '', 200),
+      });
     }
 
-    const updates = stockUpdates.map(({ id, newStock }) =>
-      supabase.from('products').update({ stock: newStock }).eq('id', id).select()
-    );
+    const { data: inserted, error: insertError } = await supabase
+      .from('orders')
+      .insert([{
+        customer_name: name,
+        customer_address: address,
+        phone,
+        payment_method: payment,
+        total_amount: computedTotal,
+        order_items: sanitizedItems,
+        observation: observation || null,
+        order_status: 'Recibido',
+        payment_status: 'Pendiente',
+      }])
+      .select('id')
+      .single();
 
-    const updateResults = await Promise.all(updates);
-
-    for (const result of updateResults) {
-      if (result.error) {
-        throw new Error('Error al actualizar el stock: ' + result.error.message);
-      }
+    if (insertError) {
+      console.error('Error al insertar la orden:', insertError.message);
+      return res.status(500).json({ error: 'Error al registrar la orden. Intenta de nuevo.' });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Orden procesada con éxito.',
+      message: 'Orden registrada con éxito.',
+      orderId: inserted.id,
       total: computedTotal,
     });
   } catch (error) {

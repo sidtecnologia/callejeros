@@ -61,6 +61,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
       };
 
       const details = await processOrder(sanitizedData);
+
       if (sanitizedData.payment === 'Transferencia') {
         setTransferOrder(details);
         onClose();

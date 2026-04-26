@@ -6,7 +6,7 @@ import { useShop } from '../context/ShopContext';
 import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
-  const { confirmOrder, addToast } = useShop();
+  const { addToast } = useShop();
   const [loading, setLoading] = useState(false);
 
   if (!orderDetails) return null;
@@ -30,28 +30,20 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
     return lines.join('\n');
   };
 
-  const finishOrder = async () => {
+  const handleCash = () => {
     setLoading(true);
     try {
-      await confirmOrder(orderDetails);
+      const encoded = encodeURIComponent(buildCashMessage());
+      const link = isMobile()
+        ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
+        : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
+      window.open(link, '_blank', 'noopener,noreferrer');
+
       addToast('Pedido confirmado. Continúa en WhatsApp para finalizar el envío.', 'Pedido confirmado');
       if (onClose) onClose();
-      setTimeout(() => window.location.reload(), 800);
-    } catch (err) {
-      addToast('No se pudo confirmar el pedido. Por favor intenta de nuevo.', 'Error');
-      alert('No se pudo procesar el pedido. Por favor intenta de nuevo más tarde.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCash = async () => {
-    const encoded = encodeURIComponent(buildCashMessage());
-    const link = isMobile()
-      ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
-      : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
-    await finishOrder();
   };
 
   return (
@@ -66,7 +58,9 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
         </div>
 
         <div className="bg-gray-100 p-4 rounded-xl text-left">
-          <p className="text-lg font-bold mb-2">Total a pagar: <span className="text-primary">${formatMoney(orderDetails.total)}</span></p>
+          <p className="text-lg font-bold mb-2">
+            Total a pagar: <span className="text-primary">${formatMoney(orderDetails.total)}</span>
+          </p>
           {orderDetails.observation ? (
             <div className="mt-2">
               <p className="font-semibold text-sm text-gray-700">Observaciones del pedido:</p>
@@ -81,7 +75,7 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
           className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2"
         >
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" className="w-6 h-6" />
-          {loading ? 'Procesando...' : 'Confirmar por WhatsApp'}
+          {loading ? 'Abriendo WhatsApp...' : 'Confirmar por WhatsApp'}
         </button>
 
         <button onClick={onClose} className="text-gray-400 text-sm hover:text-gray-600 underline">

@@ -6,8 +6,8 @@ export const initSupabase = async () => {
   if (supabaseInstance) return supabaseInstance;
 
   try {
-    const url = import.meta.env.VITE_SB_URL || import.meta.env.SB_URL;
-    const anonKey = import.meta.env.VITE_SB_ANON_KEY || import.meta.env.SB_ANON_KEY;
+    const url = import.meta.env.VITE_SB_URL;
+    const anonKey = import.meta.env.VITE_SB_ANON_KEY;
 
     if (url && anonKey) {
       supabaseInstance = createClient(url, anonKey);
@@ -36,22 +36,28 @@ export const getProducts = async () => {
 };
 
 export const placeOrderAPI = async (orderDetails) => {
-  const response = await fetch('/api/place-order', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ orderDetails }),
-  });
+  let response;
+
+  try {
+    response = await fetch('/api/place-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderDetails }),
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Verifica tu conexión.');
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error(`Error del servidor (${response.status}). Intenta de nuevo.`);
+  }
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error || 'Error procesando la orden');
+    throw new Error(data?.error || `Error procesando la orden (${response.status})`);
   }
-  return await response.json();
-};
 
-export const saveOrderToDB = async (orderData) => {
-  const supabase = await initSupabase();
-  const { data, error } = await supabase.from('orders').insert([orderData]).select();
-  if (error) throw error;
   return data;
 };

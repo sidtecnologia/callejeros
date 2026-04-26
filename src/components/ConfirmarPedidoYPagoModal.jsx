@@ -6,7 +6,7 @@ import { useShop } from '../context/ShopContext';
 import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
-  const { confirmOrder, addToast } = useShop();
+  const { addToast } = useShop();
   const [copied, setCopied] = useState(false);
   const [includeDelivery, setIncludeDelivery] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
     return lines.join('\n');
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     setLoading(true);
     try {
       const encoded = encodeURIComponent(buildMessage());
@@ -61,12 +61,8 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
         : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
-      await confirmOrder(orderDetails);
       addToast('Pedido confirmado. Continúa en WhatsApp para finalizar el envío.', 'Pedido confirmado');
       if (onClose) onClose();
-      setTimeout(() => window.location.reload(), 800);
-    } catch (err) {
-      addToast('No se pudo confirmar el pedido. Por favor intenta de nuevo.', 'Error');
     } finally {
       setLoading(false);
     }
@@ -79,7 +75,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
         <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
           <CheckCircle2 className="text-green-500 w-6 h-6 flex-shrink-0" />
           <div>
-            <p className="font-semibold text-green-800 text-sm">¡Datos de entrega guardados!</p>
+            <p className="font-semibold text-green-800 text-sm">¡Pedido registrado!</p>
             <p className="text-green-600 text-xs">Ahora completa el pago para confirmar tu pedido.</p>
           </div>
         </div>
@@ -121,7 +117,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
             <input
               type="checkbox"
               checked={includeDelivery}
-              onChange={e => setIncludeDelivery(e.target.checked)}
+              onChange={(e) => setIncludeDelivery(e.target.checked)}
               className="w-5 h-5 accent-primary rounded"
             />
             <div className="flex-1">
