@@ -35,11 +35,11 @@ export const getProducts = async () => {
   return data;
 };
 
-export const placeOrderAPI = async (orderDetails, products) => {
+export const placeOrderAPI = async (orderDetails) => {
   const response = await fetch('/api/place-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ orderDetails, products })
+    body: JSON.stringify({ orderDetails }),
   });
 
   if (!response.ok) {

@@ -5,6 +5,8 @@ import PrivacyContent from '../utils/privacy';
 import { formatMoney } from '../utils/format';
 import ConfirmarPedidoYPagoModal from './ConfirmarPedidoYPagoModal';
 
+const sanitize = (value, max) => value.trim().slice(0, max).replace(/[<>]/g, '');
+
 const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
   const { processOrder } = useShop();
   const [loading, setLoading] = useState(false);
@@ -13,21 +15,53 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     address: '',
     phone: '',
     payment: 'Efectivo',
-    terms: false
+    terms: false,
   });
   const [isPrivacyOpen, setPrivacyOpen] = useState(false);
   const [transferOrder, setTransferOrder] = useState(null);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim() || formData.name.trim().length < 3) {
+      newErrors.name = 'Ingresa tu nombre completo';
+    }
+    if (!formData.address.trim() || formData.address.trim().length < 5) {
+      newErrors.address = 'Ingresa una dirección válida';
+    }
+    if (!/^\d{7,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Ingresa un número de WhatsApp válido';
+    }
+    if (!formData.terms) {
+      newErrors.terms = 'Debes aceptar los términos y condiciones';
+    }
+    return newErrors;
+  };
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.terms) {
-      alert('Debes aceptar los términos y condiciones');
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+
     setLoading(true);
     try {
-      const details = await processOrder(formData);
-      if (formData.payment === 'Transferencia') {
+      const sanitizedData = {
+        ...formData,
+        name: sanitize(formData.name, 100),
+        address: sanitize(formData.address, 200),
+        phone: formData.phone.replace(/\s/g, '').slice(0, 15),
+      };
+
+      const details = await processOrder(sanitizedData);
+      if (sanitizedData.payment === 'Transferencia') {
         setTransferOrder(details);
         onClose();
       } else {
@@ -44,29 +78,38 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} title="Datos de Entrega">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Nombre Completo</label>
             <input
               required
               type="text"
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+              maxLength={100}
+              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                errors.name ? 'border-red-400' : 'border-gray-300'
+              }`}
               placeholder="Juan Pérez"
               value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => handleChange('name', e.target.value)}
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">WhatsApp</label>
             <input
               required
-              type="number"
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+              type="tel"
+              maxLength={15}
+              inputMode="numeric"
+              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                errors.phone ? 'border-red-400' : 'border-gray-300'
+              }`}
               placeholder="3001234567"
               value={formData.phone}
-              onChange={e => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) => handleChange('phone', e.target.value.replace(/[^\d\s]/g, ''))}
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
 
           <div>
@@ -74,11 +117,15 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
             <input
               required
               type="text"
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"
+              maxLength={200}
+              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+                errors.address ? 'border-red-400' : 'border-gray-300'
+              }`}
               placeholder="Calle 123 # 45-67 Barrio"
               value={formData.address}
-              onChange={e => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) => handleChange('address', e.target.value)}
             />
+            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
           </div>
 
           <div>
@@ -90,7 +137,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
                   name="payment"
                   value="Efectivo"
                   checked={formData.payment === 'Efectivo'}
-                  onChange={e => setFormData({ ...formData, payment: e.target.value })}
+                  onChange={(e) => handleChange('payment', e.target.value)}
                   className="accent-primary"
                 />
                 <span>Efectivo</span>
@@ -101,7 +148,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
                   name="payment"
                   value="Transferencia"
                   checked={formData.payment === 'Transferencia'}
-                  onChange={e => setFormData({ ...formData, payment: e.target.value })}
+                  onChange={(e) => handleChange('payment', e.target.value)}
                   className="accent-primary"
                 />
                 <span>Transferencia</span>
@@ -115,7 +162,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               type="checkbox"
               required
               checked={formData.terms}
-              onChange={e => setFormData({ ...formData, terms: e.target.checked })}
+              onChange={(e) => handleChange('terms', e.target.checked)}
               className="w-5 h-5 accent-primary rounded"
             />
             <label htmlFor="terms" className="text-sm text-gray-600">
@@ -130,6 +177,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               .
             </label>
           </div>
+          {errors.terms && <p className="text-red-500 text-xs -mt-2">{errors.terms}</p>}
 
           <button
             type="submit"
@@ -145,7 +193,10 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
         <div className="space-y-4">
           <PrivacyContent />
           <div className="pt-4 flex justify-end">
-            <button onClick={() => setPrivacyOpen(false)} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
+            <button
+              onClick={() => setPrivacyOpen(false)}
+              className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+            >
               Cerrar
             </button>
           </div>

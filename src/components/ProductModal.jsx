@@ -22,14 +22,22 @@ const ProductModal = ({ product, isOpen, onClose }) => {
 
   const extrasPool = useMemo(() => {
     if (!products || !product) return [];
-    return products.filter(p => p.id !== product.id && p.category && /aderez|adicional/i.test(p.category));
+    return products.filter(
+      (p) => p.id !== product.id && p.category && /aderez|adicional/i.test(p.category)
+    );
   }, [products, product]);
 
-  const aderezos = useMemo(() => extrasPool.filter(p => /aderez/i.test(p.category)), [extrasPool]);
-  const adicionales = useMemo(() => extrasPool.filter(p => /adicional/i.test(p.category)), [extrasPool]);
+  const aderezos = useMemo(
+    () => extrasPool.filter((p) => /aderez/i.test(p.category)),
+    [extrasPool]
+  );
+  const adicionales = useMemo(
+    () => extrasPool.filter((p) => /adicional/i.test(p.category)),
+    [extrasPool]
+  );
 
   const toggleExtra = (id) => {
-    setSelectedExtras(prev => {
+    setSelectedExtras((prev) => {
       const copy = { ...prev };
       if (copy[id]) {
         delete copy[id];
@@ -41,7 +49,7 @@ const ProductModal = ({ product, isOpen, onClose }) => {
   };
 
   const changeExtraQty = (id, delta) => {
-    setSelectedExtras(prev => {
+    setSelectedExtras((prev) => {
       const current = prev[id] || 0;
       const next = Math.max(1, current + delta);
       return { ...prev, [id]: next };
@@ -49,10 +57,11 @@ const ProductModal = ({ product, isOpen, onClose }) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(product, qty, observation.trim());
+    const sanitizedObservation = observation.trim().slice(0, 300).replace(/[<>]/g, '');
+    addToCart(product, qty, sanitizedObservation);
 
     Object.entries(selectedExtras).forEach(([id, extraQty]) => {
-      const extraProduct = products.find(p => String(p.id) === String(id));
+      const extraProduct = products.find((p) => String(p.id) === String(id));
       if (extraProduct) {
         addToCart(extraProduct, extraQty, '');
       }
@@ -63,24 +72,26 @@ const ProductModal = ({ product, isOpen, onClose }) => {
 
   if (!product) return null;
 
-  const images = Array.isArray(product.image) ? product.image : (product.image ? [product.image] : ['/img/placeholder.png']);
+  const images = Array.isArray(product.image)
+    ? product.image
+    : product.image
+    ? [product.image]
+    : ['/img/placeholder.png'];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Detalles del Producto">
       <div className="space-y-6">
         <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100">
-          <img
-            src={images[imgIndex]}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={images[imgIndex]} alt={product.name} className="w-full h-full object-cover" />
           {images.length > 1 && (
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
               {images.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setImgIndex(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${idx === imgIndex ? 'bg-white w-4' : 'bg-white/50'}`}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === imgIndex ? 'bg-white w-4' : 'bg-white/50'
+                  }`}
                 />
               ))}
             </div>
@@ -100,8 +111,10 @@ const ProductModal = ({ product, isOpen, onClose }) => {
             onChange={(e) => setObservation(e.target.value)}
             placeholder="Ej: Sin cebolla..."
             rows={2}
+            maxLength={300}
             className="w-full p-3 rounded-xl border border-gray-300 outline-none resize-none"
           />
+          <p className="text-xs text-gray-400 text-right mt-0.5">{observation.length}/300</p>
         </div>
 
         {(aderezos.length > 0 || adicionales.length > 0) && (
@@ -110,8 +123,11 @@ const ProductModal = ({ product, isOpen, onClose }) => {
               <div className="bg-gray-50 p-3 rounded-xl border">
                 <h4 className="font-semibold mb-3">Aderezos</h4>
                 <div className="space-y-2">
-                  {aderezos.map(e => (
-                    <div key={e.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
+                  {aderezos.map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex items-center justify-between p-2 bg-white rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
@@ -126,9 +142,19 @@ const ProductModal = ({ product, isOpen, onClose }) => {
                       </div>
                       {selectedExtras[e.id] && (
                         <div className="flex items-center gap-2">
-                          <button onClick={() => changeExtraQty(e.id, -1)} className="w-6 h-6 bg-gray-100 rounded">-</button>
+                          <button
+                            onClick={() => changeExtraQty(e.id, -1)}
+                            className="w-6 h-6 bg-gray-100 rounded"
+                          >
+                            -
+                          </button>
                           <span className="text-sm font-bold">{selectedExtras[e.id]}</span>
-                          <button onClick={() => changeExtraQty(e.id, 1)} className="w-6 h-6 bg-gray-100 rounded">+</button>
+                          <button
+                            onClick={() => changeExtraQty(e.id, 1)}
+                            className="w-6 h-6 bg-gray-100 rounded"
+                          >
+                            +
+                          </button>
                         </div>
                       )}
                     </div>
@@ -141,8 +167,11 @@ const ProductModal = ({ product, isOpen, onClose }) => {
               <div className="bg-gray-50 p-3 rounded-xl border">
                 <h4 className="font-semibold mb-3">Adicionales</h4>
                 <div className="space-y-2">
-                  {adicionales.map(e => (
-                    <div key={e.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
+                  {adicionales.map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex items-center justify-between p-2 bg-white rounded-lg border"
+                    >
                       <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
@@ -157,9 +186,19 @@ const ProductModal = ({ product, isOpen, onClose }) => {
                       </div>
                       {selectedExtras[e.id] && (
                         <div className="flex items-center gap-2">
-                          <button onClick={() => changeExtraQty(e.id, -1)} className="w-6 h-6 bg-gray-100 rounded">-</button>
+                          <button
+                            onClick={() => changeExtraQty(e.id, 1)}
+                            className="w-6 h-6 bg-gray-100 rounded"
+                          >
+                            -
+                          </button>
                           <span className="text-sm font-bold">{selectedExtras[e.id]}</span>
-                          <button onClick={() => changeExtraQty(e.id, 1)} className="w-6 h-6 bg-gray-100 rounded">+</button>
+                          <button
+                            onClick={() => changeExtraQty(e.id, 1)}
+                            className="w-6 h-6 bg-gray-100 rounded"
+                          >
+                            +
+                          </button>
                         </div>
                       )}
                     </div>
@@ -172,9 +211,13 @@ const ProductModal = ({ product, isOpen, onClose }) => {
 
         <div className="flex items-center justify-between gap-4 pt-4 border-t">
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
-            <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-3"><Minus size={18} /></button>
+            <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-3">
+              <Minus size={18} />
+            </button>
             <span className="w-8 text-center font-bold">{qty}</span>
-            <button onClick={() => setQty(qty + 1)} className="p-3"><Plus size={18} /></button>
+            <button onClick={() => setQty(Math.min(qty + 1, product.stock || 99))} className="p-3">
+              <Plus size={18} />
+            </button>
           </div>
           <button
             onClick={handleAddToCart}

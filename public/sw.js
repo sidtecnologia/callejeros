@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'fogonsocorrano-cache-v1.0.0'
+const CACHE_NAME = 'fogonsocorrano-cache-v1.1.0'
 const ASSETS = [
   '/',
   '/index.html',
