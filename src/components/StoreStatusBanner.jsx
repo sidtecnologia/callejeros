@@ -1,7 +1,10 @@
-import { Clock, Phone } from 'lucide-react';
+import { Clock, Info } from 'lucide-react';
 import { BUSINESS_CONFIG } from '../config/businessConfig';
+import { useShop } from '../context/ShopContext';
 
 const StoreStatusBanner = () => {
+  const { setBusinessModalOpen } = useShop();
+
   return (
     <div className="bg-amber-50 border border-amber-200 p-4 mb-6 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3 text-amber-800">
@@ -15,13 +18,13 @@ const StoreStatusBanner = () => {
           </p>
         </div>
       </div>
-      <a 
-        href={`tel:${BUSINESS_CONFIG.phoneRaw}`}
-        className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700 transition-colors w-full sm:w-auto justify-center"
+      <button
+        onClick={() => setBusinessModalOpen(true)}
+        className="inline-flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700 transition-colors w-full sm:w-auto justify-center"
       >
-        <Phone size={16} />
-        Llamar al negocio
-      </a>
+        <Info size={16} />
+        <span>Ver información del negocio</span>
+      </button>
     </div>
   );
 };
