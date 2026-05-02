@@ -1,5 +1,5 @@
 export const BUSINESS_CONFIG = {
-  name: "Me Gusta",
+  name: "MEGUSTA",
   description: "Sabor que Conquista",
   phone: "067683551",
   phoneRaw: "067683551",
@@ -22,7 +22,7 @@ export const BUSINESS_CONFIG = {
     'https://sgdhisqncsothssfbbnd.supabase.co/storage/v1/object/public/images/baner/baner6.webp'
   ],
   schedule: {
-    label: "Lunes - Domingo 4pm a 11pm",
+    label: "Lunes a Domingo: 4 pm - 11 pm",
     openHour: 16,
     closeHour: 23,
     timezone: "America/Bogota"

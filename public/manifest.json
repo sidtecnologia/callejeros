@@ -1,11 +1,11 @@
 {
-  "name": "Me Gusta Menu",
-  "short_name": "Me Gusta",
+  "name": "MeGusta Menu",
+  "short_name": "MeGusta",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#D31528",
-  "description": "Descubre el menú digital de Me Gusta. Pide a domicilio las mejores hamburguesas, perros calientes, papas y alitas.",
+  "description": "Pide a domicilio las mejores hamburguesas, perros calientes, papas y alitas.",
   "icons": [
     {
       "src": "img/favicon.png",
