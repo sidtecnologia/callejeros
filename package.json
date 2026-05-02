@@ -1,5 +1,5 @@
 {
-  "name": "big-burguers-pwa",
+  "name": "menumegusta",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -24,14 +24,14 @@
   "main": "eslint.config.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tecnologiasid/burguers20.git"
+    "url": "git+https://github.com/tecnologiasid/menumegusta.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/tecnologiasid/burguers20/issues"
+    "url": "https://github.com/tecnologiasid/menumegusta/issues"
   },
-  "homepage": "https://github.com/tecnologiasid/burguers20#readme"
+  "homepage": "https://github.com/tecnologiasid/menumegusta#readme"
 }

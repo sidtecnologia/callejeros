@@ -6,21 +6,26 @@ const InstallPrompt = () => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
+    const closeTimer = { current: null };
+    const showTimer = { current: null };
+
+    const triggerVisible = () => {
+      showTimer.current = setTimeout(() => {
+        setVisible(true);
+        setIsAnimating(true);
+
+        closeTimer.current = setTimeout(() => {
+          setIsAnimating(false);
+          setTimeout(() => setVisible(false), 300);
+        }, 5000);
+      }, 3000);
+    };
+
     const showBanner = (e) => {
       e.preventDefault();
       window.deferredPrompt = e;
       setDeferredPrompt(e);
       triggerVisible();
-    };
-
-    const triggerVisible = () => {
-      setVisible(true);
-      setIsAnimating(true);
-      
-      // Auto-ocultar después de 5 segundos
-      setTimeout(() => {
-        handleClose();
-      }, 5000);
     };
 
     window.addEventListener('beforeinstallprompt', showBanner);
@@ -30,12 +35,15 @@ const InstallPrompt = () => {
       triggerVisible();
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', showBanner);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', showBanner);
+      clearTimeout(showTimer.current);
+      clearTimeout(closeTimer.current);
+    };
   }, []);
 
   const handleClose = () => {
     setIsAnimating(false);
-    // Esperamos a que termine la animación de salida (300ms)
     setTimeout(() => setVisible(false), 300);
   };
 
