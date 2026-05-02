@@ -5,7 +5,7 @@ export const BUSINESS_CONFIG = {
   phoneRaw: "067683551",
   address: "Cra 12 #10-12, Plazoleta la 12 Sport, Socorro, Santander",
   mapsUrl: "https://maps.app.goo.gl/hS2YNdcXa4gwA3526",
-  whatsapp: "3208100830",
+  whatsapp: "573208100830",
   nequi: {
     number: "3227671829",
     qrUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png"
