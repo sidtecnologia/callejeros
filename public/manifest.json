@@ -1,11 +1,11 @@
 {
-  "name": "Fogón Socorrano",
-  "short_name": "Fogón Socorrano",
+  "name": "Me Gusta Menu",
+  "short_name": "Me Gusta",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2563EB",
-  "description": "Pide la mejor comida de nuestro municipio",
+  "theme_color": "#D31528",
+  "description": "Descubre el menú digital de Me Gusta. Pide a domicilio las mejores hamburguesas, perros calientes, papas y alitas. ¡Sabor que conquista!",
   "icons": [
     {
       "src": "img/favicon.png",

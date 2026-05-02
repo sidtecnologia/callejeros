@@ -4,28 +4,55 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primario: #D31528;
+  --color-secundario: #FFC300;
+  --color-fondo: #FFF9F5;
+  --color-texto: #1A1A1A;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
 }
 
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f1f1f1; 
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; 
-  border-radius: 4px;
+  background: var(--color-primario);
+  border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; 
+  background: #A0101E;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-bold py-2 px-6 rounded-xl hover:bg-blue-700 transition-colors duration-200 shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply font-bold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg active:scale-95 disabled:opacity-50;
+    background-color: var(--color-primario);
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    @apply shadow-xl brightness-110;
+    background-color: #B51222;
+  }
+
+  .price-tag {
+    @apply font-bold px-3 py-1 rounded-lg;
+    background-color: var(--color-secundario);
+    color: var(--color-primario);
+  }
+
+  .product-card {
+    @apply bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow;
   }
 }
