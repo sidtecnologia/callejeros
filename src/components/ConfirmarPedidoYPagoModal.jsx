@@ -45,7 +45,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
     lines.push('Pedido:');
     orderDetails.items.forEach((item, idx) => {
       const obs = item.observation ? ` (${item.observation})` : '';
-      lines.push(`${idx + 1}. ${item.qty} x ${item.name}${obs} - $${formatMoney(item.price * item.qty)}`);
+      lines.push(`${idx + 1}. ${item.qty} x ${item.name}${item.size ? ` [${item.size}]` : ''}${obs} - $${formatMoney(item.price * item.qty)}`);
     });
     lines.push('');
     lines.push(`Total pedido: $${formatMoney(orderDetails.total)}`);

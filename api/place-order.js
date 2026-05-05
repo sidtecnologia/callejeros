@@ -93,16 +93,13 @@ export default async (req, res) => {
       return res.status(400).json({ error: 'Número de teléfono inválido.' });
     }
 
+    // línea 70
     const itemIds = orderDetails.items.map((i) => i.id);
     const uniqueIds = [...new Set(itemIds)];
 
-    if (uniqueIds.length !== orderDetails.items.length) {
-      return res.status(400).json({ error: 'Ítems duplicados en la orden.' });
-    }
-
     const { data: dbProducts, error: fetchError } = await supabase
       .from('products')
-      .select('id, name, stock, price')
+      .select('id, name, stock, price, sizes')
       .in('id', uniqueIds);
 
     if (fetchError || !dbProducts) {
@@ -132,13 +129,29 @@ export default async (req, res) => {
         });
       }
 
-      computedTotal += dbProduct.price * qty;
+      let unitPrice = dbProduct.price;
+      let selectedSize = null;
+
+      if (Array.isArray(dbProduct.sizes) && dbProduct.sizes.length > 0) {
+        if (!item.size) {
+          return res.status(400).json({ error: `Debes seleccionar un tamaño para: ${dbProduct.name}` });
+        }
+        const matchedSize = dbProduct.sizes.find((s) => s.label === item.size);
+        if (!matchedSize) {
+          return res.status(400).json({ error: `Tamaño inválido para: ${dbProduct.name}` });
+        }
+        unitPrice = matchedSize.price;
+        selectedSize = matchedSize.label;
+      }
+
+      computedTotal += unitPrice * qty;
 
       sanitizedItems.push({
         id: dbProduct.id,
         name: dbProduct.name,
-        price: dbProduct.price,
+        price: unitPrice,
         qty,
+        size: selectedSize,
         observation: sanitizeString(item.observation || '', 200),
       });
     }

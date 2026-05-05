@@ -42,7 +42,7 @@ const CartModal = ({ isOpen, onClose, onCheckout }) => {
         <div className="flex flex-col h-full">
           <div className="max-h-[300px] overflow-y-auto pr-2 space-y-4 mb-4 scrollbar-thin scrollbar-thumb-gray-200">
             {cart.map((item) => (
-              <div key={item.id} className="flex gap-4 items-start bg-gray-50 p-3 rounded-xl border border-gray-100">
+              <div key={item._cartKey} className="flex gap-4 items-start bg-gray-50 p-3 rounded-xl border border-gray-100">
                 <img
                   src={Array.isArray(item.image) ? item.image[0] : (item.image || '/img/placeholder.png')}
                   alt={item.name}
@@ -52,17 +52,22 @@ const CartModal = ({ isOpen, onClose, onCheckout }) => {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-bold text-gray-800">{item.name}</h4>
+                      {item.size && (
+                        <span className="inline-block text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full mb-0.5">
+                          {item.size}
+                        </span>
+                      )}
                       <p className="text-primary font-semibold">${formatMoney(item.price * item.qty)}</p>
                     </div>
-                    <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500 p-1">
+                    <button onClick={() => removeFromCart(item._cartKey)} className="text-gray-400 hover:text-red-500 p-1">
                       <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => updateCartQty(item.id, -1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full">-</button>
+                  <button onClick={() => updateCartQty(item._cartKey, -1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full">-</button>
                   <span className="w-6 text-center font-bold">{item.qty}</span>
-                  <button onClick={() => updateCartQty(item.id, 1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full">+</button>
+                  <button onClick={() => updateCartQty(item._cartKey, 1)} className="w-8 h-8 flex items-center justify-center bg-white border rounded-full">+</button>
                 </div>
               </div>
             ))}
