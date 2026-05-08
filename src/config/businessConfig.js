@@ -7,8 +7,8 @@ export const BUSINESS_CONFIG = {
   mapsUrl: "https://maps.app.goo.gl/uXrdQMXZbe8r7gR37",
   whatsapp: "573172731174",
   nequi: {
-    number: "3227671829",
-    qrUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png"
+    number: "3166988393",
+    qrUrl: "https://azwffobqlorwtgnmlkcr.supabase.co/storage/v1/object/public/images/qr_pizza_express.webp"
   },
   delivery: {
     cost: 4000
