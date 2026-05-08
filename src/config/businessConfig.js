@@ -23,7 +23,7 @@ export const BUSINESS_CONFIG = {
   ],
   schedule: {
     label: "Lunes a Domingo: 11:00 am - 11:00 pm",
-    openHour: 16,
+    openHour: 11,
     closeHour: 23,
     timezone: "America/Bogota"
   }
