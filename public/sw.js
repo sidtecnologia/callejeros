@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'pizzaexpress-cache-v1.0.3'
+const CACHE_NAME = 'pizzaexpress-cache-v1.0.4'
 const ASSETS = [
   '/',
   '/index.html',
