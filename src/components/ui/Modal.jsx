@@ -31,7 +31,7 @@ const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = false }
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
       <div 
         ref={modalRef}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col"
       >
         <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
           <h3 className="text-xl font-bold text-gray-800">{title}</h3>
@@ -39,7 +39,7 @@ const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = false }
             <X size={24} />
           </button>
         </div>
-        <div className="p-6">
+        <div className="px-6 pt-6 overflow-y-auto flex-1">
           {children}
         </div>
       </div>
