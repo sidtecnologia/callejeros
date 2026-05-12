@@ -58,23 +58,22 @@ const StoreContent = () => {
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   useEffect(() => {
-    window.history.pushState({ appEntry: true }, '');
+  window.history.pushState({ appEntry: true }, '');
 
-    const handlePopState = (e) => {
-      if (!e.state || !e.state.modal) {
-        window.history.pushState({ appEntry: true }, '');
-        setShowExitDialog(true);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const handleExitConfirm = () => {
-    window.removeEventListener('popstate', () => {});
-    window.history.go(-2);
+  const handlePopState = (e) => {
+    if (!e.state?.modal) {
+      window.history.pushState({ appEntry: true }, '');
+      setShowExitDialog(true);
+    }
   };
+
+  window.addEventListener('popstate', handlePopState);
+  return () => window.removeEventListener('popstate', handlePopState);
+}, []);
+
+const handleExitConfirm = () => {
+  window.history.go(-(window.history.length));
+};
 
   useEffect(() => {
     if (products.length > 0) {
