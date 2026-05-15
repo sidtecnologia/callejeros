@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { ShoppingBag, Search, X } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
-import { BUSINESS_CONFIG } from '../config/businessConfig';
-
 
 const Navbar = ({ onSearch, onOpenCart }) => {
-  const { cart } = useShop();
+  const { cart, businessConfig } = useShop();
   const [searchValue, setSearchValue] = useState('');
   const cartCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
@@ -27,7 +25,7 @@ const Navbar = ({ onSearch, onOpenCart }) => {
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
             <img src="/img/favicon.png" alt="Logo" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
           </div>
-          <h1 className="text-xl font-bold text-gray-800 hidden md:block">{BUSINESS_CONFIG.name}</h1>
+          <h1 className="text-xl font-bold text-gray-800 hidden md:block">{businessConfig.name}</h1>
         </div>
 
         <div className="flex-1 max-w-md relative">

@@ -3,10 +3,10 @@ import Modal from './ui/Modal';
 import { CheckCircle } from 'lucide-react';
 import { formatMoney } from '../utils/format';
 import { useShop } from '../context/ShopContext';
-import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
-  const { confirmOrder, addToast } = useShop();
+  const { confirmOrder, addToast, businessConfig } = useShop();
+  const BC = businessConfig;
   const [loading, setLoading] = useState(false);
 
   if (!orderDetails) return null;
@@ -37,8 +37,8 @@ const SuccessModal = ({ isOpen, onClose, orderDetails }) => {
 
       const encoded = encodeURIComponent(buildCashMessage());
       const link = isMobile()
-        ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
-        : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
+        ? `whatsapp://send?phone=${BC.whatsapp}&text=${encoded}`
+        : `https://wa.me/${BC.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
       if (onClose) onClose();

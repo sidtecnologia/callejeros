@@ -1,9 +1,8 @@
 import { Clock, Info } from 'lucide-react';
-import { BUSINESS_CONFIG } from '../config/businessConfig';
 import { useShop } from '../context/ShopContext';
 
 const StoreStatusBanner = () => {
-  const { setBusinessModalOpen } = useShop();
+  const { setBusinessModalOpen, businessConfig } = useShop();
 
   return (
     <div className="bg-amber-50 border border-amber-200 p-4 mb-6 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -14,7 +13,7 @@ const StoreStatusBanner = () => {
         <div>
           <p className="font-bold text-sm text-left">¡Abriremos Pronto!</p>
           <p className="text-xs text-left">
-            Nuestro horario es de {BUSINESS_CONFIG.schedule.label}. Puedes ver nuestros productos si lo deseas.
+            Nuestro horario es de {businessConfig.schedule.label}. Puedes ver nuestros productos si lo deseas.
           </p>
         </div>
       </div>

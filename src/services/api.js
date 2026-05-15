@@ -35,6 +35,17 @@ export const getProducts = async () => {
   return data;
 };
 
+export const getBusinessConfig = async () => {
+  const supabase = await initSupabase();
+  const { data, error } = await supabase
+    .from('business_config')
+    .select('*')
+    .eq('id', 1)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
 export const validateOrderAPI = async (orderDetails) => {
   let response;
 

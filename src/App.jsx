@@ -12,7 +12,6 @@ import BannerCarousel from './components/BannerCarousel';
 import ExitConfirmDialog from './components/ExitConfirmDialog';
 import Toasts from './components/Toast';
 import StoreStatusBanner from './components/StoreStatusBanner';
-import { BUSINESS_CONFIG } from './config/businessConfig';
 import { useStoreHours } from './hooks/useStoreHours';
 import { Loader2, Info } from 'lucide-react';
 
@@ -47,7 +46,7 @@ const Categories = ({ categories, selected, onSelect }) => (
 );
 
 const StoreContent = () => {
-  const { products, loading, error, setBusinessModalOpen } = useShop();
+  const { products, loading, error, setBusinessModalOpen, businessConfig } = useShop();
   const isStoreOpen = useStoreHours();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todo');
@@ -134,8 +133,6 @@ const handleExitConfirm = () => {
 
   const showSections = searchTerm === '' && selectedCategory === 'Todo';
 
-  <BannerCarousel images={BUSINESS_CONFIG.banners} speed={48} />
-
   return (
     <div className="min-h-screen pb-20">
       <Navbar onSearch={setSearchTerm} onOpenCart={() => setIsCartOpen(true)} />
@@ -143,7 +140,7 @@ const handleExitConfirm = () => {
       <main className="max-w-6xl mx-auto px-3 py-4">
         {!isStoreOpen && <StoreStatusBanner />}
 
-        <BannerCarousel images={BUSINESS_CONFIG.banners} speed={48} />
+        <BannerCarousel images={businessConfig.banners} speed={48} />
 
         <Categories
           categories={categories}

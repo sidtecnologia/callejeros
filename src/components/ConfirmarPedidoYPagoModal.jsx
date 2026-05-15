@@ -3,10 +3,10 @@ import Modal from './ui/Modal';
 import { Copy, Check, CheckCircle2 } from 'lucide-react';
 import { formatMoney } from '../utils/format';
 import { useShop } from '../context/ShopContext';
-import { BUSINESS_CONFIG } from '../config/businessConfig';
 
 const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
-  const { confirmOrder, addToast } = useShop();
+  const { confirmOrder, addToast, businessConfig } = useShop();
+  const BC = businessConfig;
   const [copied, setCopied] = useState(false);
   const [includeDelivery, setIncludeDelivery] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
   if (!orderDetails) return null;
 
   const totalToPay = includeDelivery
-    ? orderDetails.total + BUSINESS_CONFIG.delivery.cost
+    ? orderDetails.total + BC.delivery.cost
     : orderDetails.total;
 
   const isMobile = () =>
@@ -22,10 +22,10 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(BUSINESS_CONFIG.nequi.number);
+      await navigator.clipboard.writeText(BC.nequi.number);
     } catch {
       const el = document.createElement('textarea');
-      el.value = BUSINESS_CONFIG.nequi.number;
+      el.value = BC.nequi.number;
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -59,8 +59,8 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
 
       const encoded = encodeURIComponent(buildMessage());
       const link = isMobile()
-        ? `whatsapp://send?phone=${BUSINESS_CONFIG.whatsapp}&text=${encoded}`
-        : `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encoded}`;
+        ? `whatsapp://send?phone=${BC.whatsapp}&text=${encoded}`
+        : `https://wa.me/${BC.whatsapp}?text=${encoded}`;
       window.open(link, '_blank', 'noopener,noreferrer');
 
       if (onClose) onClose();
@@ -85,7 +85,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
         <div className="flex flex-col items-center gap-2">
           <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Escanea el QR de Nequi</p>
           <img
-            src={BUSINESS_CONFIG.nequi.qrUrl}
+            src={BC.nequi.qrUrl}
             alt="QR Nequi"
             className="w-48 h-48 rounded-2xl border border-gray-200 shadow object-cover"
           />
@@ -95,7 +95,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
           <p className="text-sm font-semibold text-gray-700 mb-1">Número de cuenta Nequi</p>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-gray-100 rounded-xl px-4 py-3 font-mono text-gray-800 text-base tracking-widest select-all">
-              {BUSINESS_CONFIG.nequi.number}
+              {BC.nequi.number}
             </div>
             <button
               onClick={handleCopy}
@@ -124,7 +124,7 @@ const ConfirmarPedidoYPagoModal = ({ isOpen, onClose, orderDetails }) => {
             />
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-700">¿Incluir pago de domicilio?</p>
-              <p className="text-xs text-gray-400">+${formatMoney(BUSINESS_CONFIG.delivery.cost)} — ¿o pagas al recibir?</p>
+              <p className="text-xs text-gray-400">+${formatMoney(BC.delivery.cost)} — ¿o pagas al recibir?</p>
             </div>
           </label>
 

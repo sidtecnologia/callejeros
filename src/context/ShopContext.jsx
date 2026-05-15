@@ -1,9 +1,34 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getProducts, validateOrderAPI, saveOrderToDB } from '../services/api';
+import { getProducts, validateOrderAPI, saveOrderToDB, getBusinessConfig } from '../services/api';
+import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
 
 const ShopContext = createContext();
 
 export const useShop = () => useContext(ShopContext);
+
+const mapDbToConfig = (row) => ({
+  name: row.name,
+  description: row.description || '',
+  phone: row.phone || '',
+  phoneRaw: row.phone || '',
+  address: row.address || '',
+  mapsUrl: row.maps_url || '',
+  whatsapp: row.whatsapp || '',
+  nequi: {
+    number: row.nequi_number || '',
+    qrUrl: row.nequi_qr_url || '',
+  },
+  delivery: {
+    cost: row.delivery_cost ?? 0,
+  },
+  banners: row.banners || [],
+  schedule: {
+    label: row.schedule_label || '',
+    openHour: row.schedule_open ?? 0,
+    closeHour: row.schedule_close ?? 23,
+    timezone: row.schedule_tz || 'America/Bogota',
+  },
+});
 
 export const ShopProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
@@ -12,16 +37,18 @@ export const ShopProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isBusinessModalOpen, setBusinessModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [businessConfig, setBusinessConfig] = useState(BUSINESS_CONFIG_DEFAULTS);
 
   useEffect(() => {
-    fetchProducts();
+    fetchAll();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchAll = async () => {
     try {
       setLoading(true);
-      const data = await getProducts();
+      const [data, configRow] = await Promise.all([getProducts(), getBusinessConfig()]);
       setProducts(data);
+      if (configRow) setBusinessConfig(mapDbToConfig(configRow));
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -172,7 +199,9 @@ export const ShopProvider = ({ children }) => {
     };
 
     await saveOrderToDB(dbOrder);
-    await fetchProducts();
+    const [data, configRow] = await Promise.all([getProducts(), getBusinessConfig()]);
+    setProducts(data);
+    if (configRow) setBusinessConfig(mapDbToConfig(configRow));
     clearCart();
     addToast('Pedido confirmado y enviado correctamente.', 'Pedido enviado');
   };
@@ -184,6 +213,7 @@ export const ShopProvider = ({ children }) => {
         cart,
         loading,
         error,
+        businessConfig,
         addToCart,
         removeFromCart,
         updateCartQty,
