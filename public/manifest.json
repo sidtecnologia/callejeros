@@ -1,11 +1,11 @@
 {
-  "name": "Broasted Pizza Express Menu",
-  "short_name": "PizzaExpress",
+  "name": "Yuca & Sabor Menu",
+  "short_name": "Yuca & Sabor",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563EB",
-  "description": "Descubre el menú digital de Broasted y Pizza Express en Socorro.",
+  "description": "Descubre el menú digital de Yuca & Sabor en El Socorro.",
   "icons": [
     {
       "src": "img/favicon.png",
