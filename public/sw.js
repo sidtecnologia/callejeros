@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'yuca&sabor-cache-v1.0.1'
+const CACHE_NAME = 'donde-h-cache-v1.0.1'
 const ASSETS = [
   '/',
   '/index.html',
@@ -61,7 +61,7 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notificación', body: event.data ? event.data.text() : 'Tienes una nueva notificación' };
   }
 
-  const title = payload.title || 'Yuca&Sabor';
+  const title = payload.title || 'Donde-H';
   const options = {
     body: payload.body || '',
     icon: payload.icon || 'img/favicon.png',

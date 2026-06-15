@@ -1,11 +1,11 @@
 {
-  "name": "Yuca & Sabor Menu",
-  "short_name": "Yuca & Sabor",
+  "name": "Empanadas Donde H Menu",
+  "short_name": "Donde H",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563EB",
-  "description": "Descubre el menú digital de Yuca & Sabor en El Socorro.",
+  "description": "Descubre el menú digital de Empanadas Donde H en El Socorro.",
   "icons": [
     {
       "src": "img/favicon.png",
