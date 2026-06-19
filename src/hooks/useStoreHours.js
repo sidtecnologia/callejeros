@@ -6,7 +6,7 @@ export const useStoreHours = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    const { openHour, closeHour, timezone } = businessConfig.schedule;
+    const { shifts, timezone } = businessConfig.schedule;
 
     const checkStatus = () => {
       const now = new Date();
@@ -20,17 +20,25 @@ export const useStoreHours = () => {
       const parts = formatter.formatToParts(now);
       let hour = 0;
       let minute = 0;
-
       parts.forEach((part) => {
         if (part.type === 'hour') hour = parseInt(part.value, 10);
         if (part.type === 'minute') minute = parseInt(part.value, 10);
       });
 
-      const timeInMinutes = hour * 60 + minute;
-      const openTime = openHour * 60;
-      const closeTime = closeHour * 60;
+      const current = hour * 60 + minute;
 
-      setIsOpen(timeInMinutes >= openTime && timeInMinutes < closeTime);
+      const open = (shifts || []).some(({ open, close }) => {
+        const [oh, om] = open.split(':').map(Number);
+        const [ch, cm] = close.split(':').map(Number);
+        const openMin = oh * 60 + om;
+        const closeMin = ch * 60 + cm;
+        if (closeMin <= openMin) {
+          return current >= openMin || current < closeMin;
+        }
+        return current >= openMin && current < closeMin;
+      });
+
+      setIsOpen(open);
     };
 
     checkStatus();

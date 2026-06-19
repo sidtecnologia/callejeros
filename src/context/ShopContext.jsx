@@ -24,8 +24,9 @@ const mapDbToConfig = (row) => ({
   banners: row.banners || [],
   schedule: {
     label: row.schedule_label || '',
-    openHour: row.schedule_open ?? 0,
-    closeHour: row.schedule_close ?? 23,
+    shifts: Array.isArray(row.schedule_shifts) && row.schedule_shifts.length > 0
+      ? row.schedule_shifts
+      : [{ open: '08:00', close: '20:00' }],
     timezone: row.schedule_tz || 'America/Bogota',
   },
 });
