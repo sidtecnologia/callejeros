@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useBackGuard } from '../../hooks/useBackGuard';
 
-const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = false }) => {
+const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = true }) => {
   const modalRef = useRef();
   useBackGuard(isOpen, onClose);
 
