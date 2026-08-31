@@ -14,7 +14,7 @@ import Toasts from './components/Toast';
 import StoreStatusBanner from './components/StoreStatusBanner';
 import { useStoreHours } from './hooks/useStoreHours';
 import { Loader2, Info } from 'lucide-react';
-
+import { analytics } from './services/analytics';
 
 const shuffleArray = (arr) => {
   const copy = [...arr];
@@ -48,6 +48,7 @@ const Categories = ({ categories, selected, onSelect }) => (
 const StoreContent = () => {
   const { products, loading, error, setBusinessModalOpen, businessConfig } = useShop();
   const isStoreOpen = useStoreHours();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todo');
   const [activeProduct, setActiveProduct] = useState(null);
@@ -55,27 +56,71 @@ const StoreContent = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [successOrder, setSuccessOrder] = useState(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [sessionStartTime] = useState(Date.now());
+
+  const categories = useMemo(() => {
+    if (!products) return [];
+    const cats = [...new Set(products.map(p => p.category))];
+    return cats.filter(Boolean);
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    return products.filter(p => {
+      const searchLower = searchTerm.toLowerCase().trim();
+      const matchesSearch = !searchLower ||
+        p.name.toLowerCase().includes(searchLower) ||
+        (p.description && p.description.toLowerCase().includes(searchLower)) ||
+        (p.category && p.category.toLowerCase().includes(searchLower));
+      const matchesCategory = selectedCategory === 'Todo' || p.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, selectedCategory]);
+
+  const featuredBase = useMemo(() => {
+    if (!products) return [];
+    return products.filter(p => p.featured);
+  }, [products]);
+
+  const offers = useMemo(() => {
+    if (!products) return [];
+    return products.filter(p => p.isOffer);
+  }, [products]);
+
+  const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
-  window.history.pushState({ appEntry: true }, '');
-
-  const handlePopState = (e) => {
-    if (!e.state?.modal) {
-      window.history.pushState({ appEntry: true }, '');
-      setShowExitDialog(true);
+    if (!loading && !error && businessConfig?.name) {
+      analytics.menuView(businessConfig.name, businessConfig.slug || '', businessConfig.citySlug || '');
     }
-  };
-
-  window.addEventListener('popstate', handlePopState);
-  return () => window.removeEventListener('popstate', handlePopState);
-}, []);
-
-const handleExitConfirm = () => {
-  window.history.go(-(window.history.length));
-};
+  }, [loading, error, businessConfig?.name, businessConfig?.slug, businessConfig?.citySlug]);
 
   useEffect(() => {
-    if (products.length > 0) {
+    const handleBeforeUnload = () => {
+      const sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000);
+      analytics.sessionEnd(sessionDuration, businessConfig?.name || '');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [sessionStartTime, businessConfig?.name]);
+
+  useEffect(() => {
+    window.history.pushState({ appEntry: true }, '');
+
+    const handlePopState = (e) => {
+      if (!e.state?.modal) {
+        window.history.pushState({ appEntry: true }, '');
+        setShowExitDialog(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    if (products && products.length > 0) {
       const params = new URLSearchParams(window.location.search);
       const productId = params.get('p');
 
@@ -89,38 +134,38 @@ const handleExitConfirm = () => {
     }
   }, [products]);
 
-  const categories = useMemo(() => {
-    const cats = [...new Set(products.map(p => p.category))];
-    return cats.filter(Boolean);
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      const searchLower = searchTerm.toLowerCase().trim();
-      const matchesSearch = !searchLower ||
-        p.name.toLowerCase().includes(searchLower) ||
-        (p.description && p.description.toLowerCase().includes(searchLower)) ||
-        (p.category && p.category.toLowerCase().includes(searchLower));
-      const matchesCategory = selectedCategory === 'Todo' || p.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [products, searchTerm, selectedCategory]);
-
-  const featuredBase = useMemo(() => products.filter(p => p.featured), [products]);
-  const [featured, setFeatured] = useState(() => shuffleArray(featuredBase));
-
   useEffect(() => {
     setFeatured(shuffleArray(featuredBase));
   }, [featuredBase]);
 
+  const handleExitConfirm = () => {
+    window.history.go(-(window.history.length));
+  };
+
   const handleSelectCategory = (cat) => {
     setSelectedCategory(cat);
+    analytics.selectCategory(cat, businessConfig?.name);
     if (cat === 'Todo') {
       setFeatured(shuffleArray(featuredBase));
     }
   };
 
-  const offers = useMemo(() => products.filter(p => p.isOffer), [products]);
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    if (term.trim()) {
+      const results = filteredProducts.length;
+      analytics.search(term, results, businessConfig?.name);
+    }
+  };
+
+  const handleProductClick = (product) => {
+    setActiveProduct(product);
+    analytics.viewItem(product.id, product.name, product.price, businessConfig?.name, product.category);
+  };
+
+  const handleOpenCart = () => {
+    setIsCartOpen(true);
+  };
 
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center gap-4 text-primary">
@@ -135,12 +180,12 @@ const handleExitConfirm = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      <Navbar onSearch={setSearchTerm} onOpenCart={() => setIsCartOpen(true)} />
+      <Navbar onSearch={handleSearch} onOpenCart={handleOpenCart} />
 
       <main className="max-w-6xl mx-auto px-3 py-4">
         {!isStoreOpen && <StoreStatusBanner />}
 
-        <BannerCarousel images={businessConfig.banners} speed={48} />
+        <BannerCarousel images={businessConfig?.banners || []} speed={48} />
 
         <Categories
           categories={categories}
@@ -159,7 +204,7 @@ const handleExitConfirm = () => {
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {featured.map(p => (
-                      <ProductCard key={p.id} product={p} onClick={setActiveProduct} isStoreOpen={isStoreOpen} />
+                      <ProductCard key={p.id} product={p} onClick={handleProductClick} isStoreOpen={isStoreOpen} />
                     ))}
                   </div>
                 </section>
@@ -173,7 +218,7 @@ const handleExitConfirm = () => {
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {offers.map(p => (
-                      <ProductCard key={p.id} product={p} onClick={setActiveProduct} isStoreOpen={isStoreOpen} />
+                      <ProductCard key={p.id} product={p} onClick={handleProductClick} isStoreOpen={isStoreOpen} />
                     ))}
                   </div>
                 </section>
@@ -187,7 +232,7 @@ const handleExitConfirm = () => {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {filteredProducts.map(p => (
-                    <ProductCard key={p.id} product={p} onClick={setActiveProduct} isStoreOpen={isStoreOpen} />
+                    <ProductCard key={p.id} product={p} onClick={handleProductClick} isStoreOpen={isStoreOpen} />
                   ))}
                 </div>
               )}
@@ -198,7 +243,10 @@ const handleExitConfirm = () => {
 
       <footer className="bg-white border-t mt-8 py-6 text-center text-gray-500 text-xs">
         <button
-          onClick={() => setBusinessModalOpen(true)}
+          onClick={() => {
+            setBusinessModalOpen(true);
+            analytics.businessInfoView(businessConfig?.name);
+          }}
           className="inline-flex items-center gap-2 px-4 py-2 mb-3 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
         >
           <Info size={16} />
@@ -217,12 +265,14 @@ const handleExitConfirm = () => {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         onCheckout={() => setIsCheckoutOpen(true)}
+        businessName={businessConfig?.name}
       />
 
       <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         onSuccess={(details) => setSuccessOrder(details)}
+        businessName={businessConfig?.name}
       />
 
       <SuccessModal

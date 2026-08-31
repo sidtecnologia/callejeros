@@ -1,17 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
-let supabaseInstance = null;
+export let supabase = null;
 
 export const initSupabase = async () => {
-  if (supabaseInstance) return supabaseInstance;
+  if (supabase) return supabase;
 
   try {
     const url = import.meta.env.VITE_SB_URL;
     const anonKey = import.meta.env.VITE_SB_ANON_KEY;
 
     if (url && anonKey) {
-      supabaseInstance = createClient(url, anonKey);
-      return supabaseInstance;
+      supabase = createClient(url, anonKey);
+      return supabase;
     }
 
     const response = await fetch('/api/get-config');
@@ -20,8 +20,8 @@ export const initSupabase = async () => {
     const config = await response.json();
     if (!config.url || !config.anonKey) throw new Error('Missing credentials');
 
-    supabaseInstance = createClient(config.url, config.anonKey);
-    return supabaseInstance;
+    supabase = createClient(config.url, config.anonKey);
+    return supabase;
   } catch (error) {
     console.error('API Initialization Error:', error);
     throw error;
@@ -29,15 +29,15 @@ export const initSupabase = async () => {
 };
 
 export const getProducts = async () => {
-  const supabase = await initSupabase();
-  const { data, error } = await supabase.from('products').select('*');
+  const sb = await initSupabase();
+  const { data, error } = await sb.from('products').select('*');
   if (error) throw error;
   return data;
 };
 
 export const getBusinessConfig = async () => {
-  const supabase = await initSupabase();
-  const { data, error } = await supabase
+  const sb = await initSupabase();
+  const { data, error } = await sb
     .from('business_config')
     .select('*')
     .eq('id', 1)
@@ -74,8 +74,8 @@ export const validateOrderAPI = async (orderDetails) => {
 };
 
 export const saveOrderToDB = async (orderData) => {
-  const supabase = await initSupabase();
-  const { data, error } = await supabase.from('orders').insert([orderData]).select();
+  const sb = await initSupabase();
+  const { data, error } = await sb.from('orders').insert([orderData]).select();
   if (error) throw error;
   return data;
 };

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getProducts, validateOrderAPI, saveOrderToDB, getBusinessConfig } from '../services/api';
+import { analytics } from '../services/analytics';
 import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
 
 const ShopContext = createContext();
@@ -114,11 +115,16 @@ export const ShopProvider = ({ children }) => {
     if (limitReached) {
       alert(`Solo quedan ${product.stock} unidades disponibles.`);
     } else {
+      analytics.addToCart(product.id, product.name, qty, product.price, businessConfig.name);
       addToast(`${product.name}${size ? ` (${size.label})` : ''} agregado al carrito.`, 'Producto agregado');
     }
   };
 
   const removeFromCart = (cartKey) => {
+    const item = cart.find((i) => i._cartKey === cartKey);
+    if (item) {
+      analytics.removeFromCart(item.id, item.name, businessConfig.name);
+    }
     setCart((prevCart) => prevCart.filter((item) => item._cartKey !== cartKey));
   };
 
@@ -157,6 +163,8 @@ export const ShopProvider = ({ children }) => {
     const aggregatedObservation =
       itemObservations.length > 0 ? itemObservations.join(' | ') : '';
 
+    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
     const orderPayload = {
       name: customerData.name,
       address: customerData.address,
@@ -173,7 +181,11 @@ export const ShopProvider = ({ children }) => {
       })),
     };
 
+    analytics.beginCheckout(cart.length, cartTotal, customerData.payment, businessConfig.name);
+
     const result = await validateOrderAPI(orderPayload);
+
+    analytics.orderValidated(cart.length, result.total, customerData.payment, businessConfig.name);
 
     return {
       name: result.customerData.name,
@@ -199,7 +211,16 @@ export const ShopProvider = ({ children }) => {
       payment_status: 'Pendiente',
     };
 
-    await saveOrderToDB(dbOrder);
+    const savedOrder = await saveOrderToDB(dbOrder);
+    
+    analytics.orderRecorded(
+      savedOrder.id || 'unknown',
+      orderDetails.items.length,
+      orderDetails.total,
+      orderDetails.payment,
+      businessConfig.name
+    );
+
     const [data, configRow] = await Promise.all([getProducts(), getBusinessConfig()]);
     setProducts(data);
     if (configRow) setBusinessConfig(mapDbToConfig(configRow));

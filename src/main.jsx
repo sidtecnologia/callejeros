@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
+import { analytics } from './services/analytics'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -9,7 +10,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 )
 
-// Service Worker registration for PWA (only in production and if supported)
+analytics.init();
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
@@ -22,11 +24,8 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-
 window.addEventListener('beforeinstallprompt', (e) => {
-  // prevent the automatic mini-infobar on mobile
   e.preventDefault();
   window.deferredPrompt = e;
-  // dispatch custom event to notify listeners (InstallPrompt)
   window.dispatchEvent(new Event('deferredPromptReady'));
 });
