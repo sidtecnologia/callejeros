@@ -15,6 +15,7 @@ import StoreStatusBanner from './components/StoreStatusBanner';
 import { useStoreHours } from './hooks/useStoreHours';
 import { Loader2, Info } from 'lucide-react';
 import { analytics } from './services/analytics';
+import { Analytics } from "@vercel/analytics/next"
 
 const shuffleArray = (arr) => {
   const copy = [...arr];
