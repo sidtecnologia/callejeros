@@ -14,8 +14,6 @@ import Toasts from './components/Toast';
 import StoreStatusBanner from './components/StoreStatusBanner';
 import { useStoreHours } from './hooks/useStoreHours';
 import { Loader2, Info } from 'lucide-react';
-import { analytics } from './services/analytics';
-import { Analytics } from "@vercel/analytics/next"
 
 const shuffleArray = (arr) => {
   const copy = [...arr];
@@ -57,7 +55,6 @@ const StoreContent = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [successOrder, setSuccessOrder] = useState(null);
   const [showExitDialog, setShowExitDialog] = useState(false);
-  const [sessionStartTime] = useState(Date.now());
 
   const categories = useMemo(() => {
     if (!products) return [];
@@ -90,21 +87,7 @@ const StoreContent = () => {
 
   const [featured, setFeatured] = useState([]);
 
-  useEffect(() => {
-    if (!loading && !error && businessConfig?.name) {
-      analytics.menuView(businessConfig.name, businessConfig.slug || '', businessConfig.citySlug || '');
-    }
-  }, [loading, error, businessConfig?.name, businessConfig?.slug, businessConfig?.citySlug]);
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      const sessionDuration = Math.round((Date.now() - sessionStartTime) / 1000);
-      analytics.sessionEnd(sessionDuration, businessConfig?.name || '');
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [sessionStartTime, businessConfig?.name]);
 
   useEffect(() => {
     window.history.pushState({ appEntry: true }, '');
@@ -145,7 +128,6 @@ const StoreContent = () => {
 
   const handleSelectCategory = (cat) => {
     setSelectedCategory(cat);
-    analytics.selectCategory(cat, businessConfig?.name);
     if (cat === 'Todo') {
       setFeatured(shuffleArray(featuredBase));
     }
@@ -155,13 +137,11 @@ const StoreContent = () => {
     setSearchTerm(term);
     if (term.trim()) {
       const results = filteredProducts.length;
-      analytics.search(term, results, businessConfig?.name);
     }
   };
 
   const handleProductClick = (product) => {
     setActiveProduct(product);
-    analytics.viewItem(product.id, product.name, product.price, businessConfig?.name, product.category);
   };
 
   const handleOpenCart = () => {
@@ -246,7 +226,6 @@ const StoreContent = () => {
         <button
           onClick={() => {
             setBusinessModalOpen(true);
-            analytics.businessInfoView(businessConfig?.name);
           }}
           className="inline-flex items-center gap-2 px-4 py-2 mb-3 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
         >

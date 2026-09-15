@@ -1,11 +1,11 @@
 {
-  "name": "Empanadas Donde H Menu",
-  "short_name": "Donde H",
+  "name": "chatarrita express Menu",
+  "short_name": "chatarrita express",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563EB",
-  "description": "Descubre el menú digital de Empanadas Donde H en El Socorro.",
+  "description": "Descubre el menú digital de Chatarrita Express en Barrancabermeja.",
   "icons": [
     {
       "src": "img/favicon.png",
