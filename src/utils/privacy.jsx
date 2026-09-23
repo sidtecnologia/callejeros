@@ -21,6 +21,7 @@ export const PrivacyContent = ({
 
   const email =
     businessConfig?.email ||
+    BUSINESS_CONFIG_DEFAULTS.email ||
     'correo de contacto';
 
   return (
