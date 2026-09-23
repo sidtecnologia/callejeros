@@ -6,6 +6,62 @@ const ShopContext = createContext();
 
 export const useShop = () => useContext(ShopContext);
 
+const EMPTY_SCHEDULE = {
+  mon: [],
+  tue: [],
+  wed: [],
+  thu: [],
+  fri: [],
+  sat: [],
+  sun: [],
+};
+
+const normalizeShift = (shift) => {
+  if (!shift || typeof shift !== 'object') return null;
+
+  const open = typeof shift.open === 'string' ? shift.open : '';
+  const close = typeof shift.close === 'string' ? shift.close : '';
+
+  if (!open || !close) return null;
+
+  return {
+    open,
+    close,
+  };
+};
+
+const normalizeSchedule = (value) => {
+  if (Array.isArray(value)) {
+    const legacyShifts = value
+      .map(normalizeShift)
+      .filter(Boolean);
+
+    return {
+      mon: legacyShifts,
+      tue: legacyShifts,
+      wed: legacyShifts,
+      thu: legacyShifts,
+      fri: legacyShifts,
+      sat: legacyShifts,
+      sun: legacyShifts,
+    };
+  }
+
+  if (!value || typeof value !== 'object') {
+    return EMPTY_SCHEDULE;
+  }
+
+  return Object.keys(EMPTY_SCHEDULE).reduce((schedule, day) => {
+    const dayShifts = Array.isArray(value[day]) ? value[day] : [];
+
+    schedule[day] = dayShifts
+      .map(normalizeShift)
+      .filter(Boolean);
+
+    return schedule;
+  }, { ...EMPTY_SCHEDULE });
+};
+
 const mapDbToConfig = (row) => ({
   name: row.name,
   description: row.description || '',
@@ -21,12 +77,10 @@ const mapDbToConfig = (row) => ({
   delivery: {
     cost: row.delivery_cost ?? 0,
   },
-  banners: row.banners || [],
+  banners: Array.isArray(row.banners) ? row.banners : [],
   schedule: {
     label: row.schedule_label || '',
-    shifts: Array.isArray(row.schedule_shifts) && row.schedule_shifts.length > 0
-      ? row.schedule_shifts
-      : [{ open: '08:00', close: '20:00' }],
+    shifts: normalizeSchedule(row.schedule_shifts),
     timezone: row.schedule_tz || 'America/Bogota',
   },
 });
@@ -47,9 +101,17 @@ export const ShopProvider = ({ children }) => {
   const fetchAll = async () => {
     try {
       setLoading(true);
-      const [data, configRow] = await Promise.all([getProducts(), getBusinessConfig()]);
+
+      const [data, configRow] = await Promise.all([
+        getProducts(),
+        getBusinessConfig(),
+      ]);
+
       setProducts(data);
-      if (configRow) setBusinessConfig(mapDbToConfig(configRow));
+
+      if (configRow) {
+        setBusinessConfig(mapDbToConfig(configRow));
+      }
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -60,8 +122,11 @@ export const ShopProvider = ({ children }) => {
   const addToast = (message, title = '') => {
     const id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
     const toast = { id, title, message };
+
     setToasts((prev) => [toast, ...prev]);
+
     setTimeout(() => removeToast(id), 3200);
+
     return id;
   };
 
@@ -73,7 +138,10 @@ export const ShopProvider = ({ children }) => {
     let limitReached = false;
 
     setCart((prevCart) => {
-      const cartKey = size ? `${product.id}__${size.label}` : String(product.id);
+      const cartKey = size
+        ? `${product.id}__${size.label}`
+        : String(product.id);
+
       const existing = prevCart.find((item) => item._cartKey === cartKey);
       const currentQty = existing ? existing.qty : 0;
 
@@ -96,42 +164,46 @@ export const ShopProvider = ({ children }) => {
               }
             : item
         );
-      } else {
-        return [
-          ...prevCart,
-          {
-            ...product,
-            _cartKey: cartKey,
-            qty,
-            price: size ? size.price : product.price,
-            size: size ? size.label : null,
-            observation: observation || '',
-          },
-        ];
       }
+
+      return [
+        ...prevCart,
+        {
+          ...product,
+          _cartKey: cartKey,
+          qty,
+          price: size ? size.price : product.price,
+          size: size ? size.label : null,
+          observation: observation || '',
+        },
+      ];
     });
 
     if (limitReached) {
       alert(`Solo quedan ${product.stock} unidades disponibles.`);
     } else {
-      addToast(`${product.name}${size ? ` (${size.label})` : ''} agregado al carrito.`, 'Producto agregado');
+      addToast(
+        `${product.name}${size ? ` (${size.label})` : ''} agregado al carrito.`,
+        'Producto agregado'
+      );
     }
   };
 
   const removeFromCart = (cartKey) => {
-    const item = cart.find((i) => i._cartKey === cartKey);
-    if (item) {
-    }
-    setCart((prevCart) => prevCart.filter((item) => item._cartKey !== cartKey));
+    setCart((prevCart) =>
+      prevCart.filter((item) => item._cartKey !== cartKey)
+    );
   };
 
   const updateCartQty = (cartKey, delta) => {
     let limitReached = false;
+
     const cartItem = cart.find((i) => i._cartKey === cartKey);
     const product = products.find((p) => p.id === cartItem?.id);
 
     setCart((prevCart) => {
       const item = prevCart.find((i) => i._cartKey === cartKey);
+
       if (!item || !product) return prevCart;
 
       const newQty = item.qty + delta;
@@ -141,8 +213,15 @@ export const ShopProvider = ({ children }) => {
         return prevCart;
       }
 
-      if (newQty <= 0) return prevCart.filter((i) => i._cartKey !== cartKey);
-      return prevCart.map((i) => (i._cartKey === cartKey ? { ...i, qty: newQty } : i));
+      if (newQty <= 0) {
+        return prevCart.filter((i) => i._cartKey !== cartKey);
+      }
+
+      return prevCart.map((i) =>
+        i._cartKey === cartKey
+          ? { ...i, qty: newQty }
+          : i
+      );
     });
 
     if (limitReached) {
@@ -154,13 +233,17 @@ export const ShopProvider = ({ children }) => {
 
   const processOrder = async (customerData) => {
     const itemObservations = cart
-      .map((i) => (i.observation && i.observation.trim() ? i.observation.trim() : null))
+      .map((i) =>
+        i.observation && i.observation.trim()
+          ? i.observation.trim()
+          : null
+      )
       .filter(Boolean);
 
     const aggregatedObservation =
-      itemObservations.length > 0 ? itemObservations.join(' | ') : '';
-
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      itemObservations.length > 0
+        ? itemObservations.join(' | ')
+        : '';
 
     const orderPayload = {
       name: customerData.name,
@@ -204,13 +287,25 @@ export const ShopProvider = ({ children }) => {
       payment_status: 'Pendiente',
     };
 
-    const savedOrder = await saveOrderToDB(dbOrder);
+    await saveOrderToDB(dbOrder);
 
-    const [data, configRow] = await Promise.all([getProducts(), getBusinessConfig()]);
+    const [data, configRow] = await Promise.all([
+      getProducts(),
+      getBusinessConfig(),
+    ]);
+
     setProducts(data);
-    if (configRow) setBusinessConfig(mapDbToConfig(configRow));
+
+    if (configRow) {
+      setBusinessConfig(mapDbToConfig(configRow));
+    }
+
     clearCart();
-    addToast('Pedido confirmado y enviado correctamente.', 'Pedido enviado');
+
+    addToast(
+      'Pedido confirmado y enviado correctamente.',
+      'Pedido enviado'
+    );
   };
 
   return (

@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import Modal from './ui/Modal';
 import { useShop } from '../context/ShopContext';
+import { useStoreHours } from '../hooks/useStoreHours';
 import PrivacyContent from '../utils/privacy';
 import ConfirmarPedidoYPagoModal from './ConfirmarPedidoYPagoModal';
 
-const sanitize = (value, max) => value.trim().slice(0, max).replace(/[<>]/g, '');
+const sanitize = (value, max) =>
+  value.trim().slice(0, max).replace(/[<>]/g, '');
 
 const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
   const { processOrder } = useShop();
+  const isStoreOpen = useStoreHours();
+
   const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -16,41 +21,65 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     payment: 'Efectivo',
     terms: false,
   });
+
   const [isPrivacyOpen, setPrivacyOpen] = useState(false);
   const [transferOrder, setTransferOrder] = useState(null);
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
+
     if (!formData.name.trim() || formData.name.trim().length < 3) {
       newErrors.name = 'Ingresa tu nombre completo';
     }
+
     if (!formData.address.trim() || formData.address.trim().length < 5) {
       newErrors.address = 'Ingresa una dirección válida';
     }
+
     if (!/^\d{7,15}$/.test(formData.phone.replace(/\s/g, ''))) {
       newErrors.phone = 'Ingresa un número de WhatsApp válido';
     }
+
     if (!formData.terms) {
       newErrors.terms = 'Debes aceptar los términos y condiciones';
     }
+
     return newErrors;
   };
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isStoreOpen) {
+      alert('El negocio está cerrado en este momento. Intenta nuevamente durante el horario de atención.');
+      onClose();
+      return;
+    }
+
     const validationErrors = validate();
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
     setLoading(true);
+
     try {
       const sanitizedData = {
         ...formData,
@@ -77,10 +106,21 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Datos de Entrega">
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Datos de Entrega"
+      >
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          noValidate
+        >
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">Nombre Completo</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-700">
+              Nombre Completo
+            </label>
+
             <input
               required
               type="text"
@@ -92,11 +132,19 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.name}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">WhatsApp</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-700">
+              WhatsApp
+            </label>
+
             <input
               required
               type="tel"
@@ -107,13 +155,26 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               }`}
               placeholder="3001234567"
               value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value.replace(/[^\d\s]/g, ''))}
+              onChange={(e) =>
+                handleChange(
+                  'phone',
+                  e.target.value.replace(/[^\d\s]/g, '')
+                )
+              }
             />
-            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+
+            {errors.phone && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.phone}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">Dirección de Entrega</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-700">
+              Dirección de Entrega
+            </label>
+
             <input
               required
               type="text"
@@ -123,13 +184,23 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               }`}
               placeholder="Calle 123 # 45-67 Barrio"
               value={formData.address}
-              onChange={(e) => handleChange('address', e.target.value)}
+              onChange={(e) =>
+                handleChange('address', e.target.value)
+              }
             />
-            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+
+            {errors.address && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.address}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2 text-gray-700">Método de Pago</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Método de Pago
+            </label>
+
             <div className="flex gap-4">
               <label className="flex items-center gap-2 p-3 border rounded-xl flex-1 cursor-pointer hover:bg-gray-50">
                 <input
@@ -137,18 +208,23 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
                   name="payment"
                   value="Efectivo"
                   checked={formData.payment === 'Efectivo'}
-                  onChange={(e) => handleChange('payment', e.target.value)}
+                  onChange={(e) =>
+                    handleChange('payment', e.target.value)
+                  }
                   className="accent-primary"
                 />
                 <span>Efectivo</span>
               </label>
+
               <label className="flex items-center gap-2 p-3 border rounded-xl flex-1 cursor-pointer hover:bg-gray-50">
                 <input
                   type="radio"
                   name="payment"
                   value="Transferencia"
                   checked={formData.payment === 'Transferencia'}
-                  onChange={(e) => handleChange('payment', e.target.value)}
+                  onChange={(e) =>
+                    handleChange('payment', e.target.value)
+                  }
                   className="accent-primary"
                 />
                 <span>Transferencia</span>
@@ -162,10 +238,16 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               type="checkbox"
               required
               checked={formData.terms}
-              onChange={(e) => handleChange('terms', e.target.checked)}
+              onChange={(e) =>
+                handleChange('terms', e.target.checked)
+              }
               className="w-5 h-5 accent-primary rounded"
             />
-            <label htmlFor="terms" className="text-sm text-gray-600">
+
+            <label
+              htmlFor="terms"
+              className="text-sm text-gray-600"
+            >
               Acepto el{' '}
               <button
                 type="button"
@@ -177,21 +259,35 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
               .
             </label>
           </div>
-          {errors.terms && <p className="text-red-500 text-xs -mt-2">{errors.terms}</p>}
+
+          {errors.terms && (
+            <p className="text-red-500 text-xs -mt-2">
+              {errors.terms}
+            </p>
+          )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full btn-primary py-3 text-lg flex justify-center"
+            disabled={loading || !isStoreOpen}
+            className="w-full btn-primary py-3 text-lg flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Verificando...' : 'Continuar'}
+            {loading
+              ? 'Verificando...'
+              : !isStoreOpen
+                ? 'Negocio cerrado'
+                : 'Continuar'}
           </button>
         </form>
       </Modal>
 
-      <Modal isOpen={isPrivacyOpen} onClose={() => setPrivacyOpen(false)} title="Tratamiento de Datos">
+      <Modal
+        isOpen={isPrivacyOpen}
+        onClose={() => setPrivacyOpen(false)}
+        title="Tratamiento de Datos"
+      >
         <div className="space-y-4">
           <PrivacyContent />
+
           <div className="pt-4 flex justify-end">
             <button
               onClick={() => setPrivacyOpen(false)}
