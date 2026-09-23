@@ -1,17 +1,27 @@
 import React from 'react';
+import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
 
-export const PrivacyContent = ({ businessConfig }) => {
-  const name = businessConfig?.name?.trim() || 'nuestro negocio';
-  const address = businessConfig?.address?.trim() || 'nuestra sede';
+export const PrivacyContent = ({
+  businessConfig = BUSINESS_CONFIG_DEFAULTS,
+}) => {
+  const name =
+    businessConfig?.name ||
+    BUSINESS_CONFIG_DEFAULTS.name;
+
+  const address =
+    businessConfig?.address ||
+    BUSINESS_CONFIG_DEFAULTS.address ||
+    'nuestra sede';
 
   const phone =
-    businessConfig?.phone?.trim() ||
-    businessConfig?.phoneRaw?.trim() ||
+    businessConfig?.phone ||
+    businessConfig?.phoneRaw ||
+    BUSINESS_CONFIG_DEFAULTS.phone ||
     'nuestras líneas de atención';
 
   const email =
-    businessConfig?.email?.trim() ||
-    'el correo electrónico registrado por el negocio';
+    businessConfig?.email ||
+    'correo de contacto';
 
   return (
     <div className="text-gray-700 leading-relaxed space-y-4">
@@ -21,9 +31,10 @@ export const PrivacyContent = ({ businessConfig }) => {
 
       <p>
         El responsable del tratamiento de sus datos personales es{' '}
-        <strong>{name}</strong>, con domicilio en {address}. Para ejercer sus
-        derechos sobre sus datos, puede contactarnos al teléfono{' '}
-        <span className="text-blue-600">{phone}</span> o al correo electrónico{' '}
+        <strong>{name}</strong>, con domicilio en {address}. Para ejercer
+        sus derechos sobre sus datos, puede contactarnos al teléfono{' '}
+        <span className="text-blue-600">{phone}</span> o al correo
+        electrónico{' '}
         <span className="text-blue-600">{email}</span>.
       </p>
 
@@ -32,13 +43,16 @@ export const PrivacyContent = ({ businessConfig }) => {
       </h2>
 
       <p>
-        Recopilamos nombre, teléfono, dirección y detalles de transacción para:
+        Recopilamos nombre, teléfono, dirección y detalles de transacción
+        para:
       </p>
 
       <ul className="list-disc pl-5 space-y-1">
         <li>Procesar, despachar y entregar sus pedidos.</li>
         <li>Gestionar cobros e informar el estado del domicilio.</li>
-        <li>Compartir con domiciliarios encargados del despacho de la orden.</li>
+        <li>
+          Compartir con domiciliarios encargados del despacho de la orden.
+        </li>
       </ul>
 
       <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
@@ -48,8 +62,10 @@ export const PrivacyContent = ({ businessConfig }) => {
       <p>
         Al marcar la casilla de aceptación en la PWA y confirmar el pedido,
         usted otorga su{' '}
-        <strong>consentimiento previo, expreso e informado</strong> para el
-        tratamiento de sus datos según esta política.
+        <strong>
+          consentimiento previo, expreso e informado
+        </strong>{' '}
+        para el tratamiento de sus datos según esta política.
       </p>
 
       <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
@@ -65,6 +81,7 @@ export const PrivacyContent = ({ businessConfig }) => {
           Conocer, actualizar y rectificar sus datos personales en cualquier
           momento.
         </li>
+
         <li>
           Solicitar la supresión de sus datos o revocar la autorización
           enviando una solicitud a {email}.
@@ -76,8 +93,9 @@ export const PrivacyContent = ({ businessConfig }) => {
       </h2>
 
       <p>
-        Implementamos medidas tecnológicas de seguridad y almacenamiento local
-        seguro en la PWA para evitar el acceso no autorizado a su información.
+        Implementamos medidas tecnológicas de seguridad y almacenamiento
+        local seguro en la PWA para evitar el acceso no autorizado a su
+        información.
       </p>
     </div>
   );

@@ -9,7 +9,7 @@ const sanitize = (value, max) =>
   value.trim().slice(0, max).replace(/[<>]/g, '');
 
 const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
-  const { processOrder } = useShop();
+  const { processOrder, businessConfig } = useShop();
   const isStoreOpen = useStoreHours();
 
   const [loading, setLoading] = useState(false);
@@ -66,7 +66,9 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!isStoreOpen) {
-      alert('El negocio está cerrado en este momento. Intenta nuevamente durante el horario de atención.');
+      alert(
+        'El negocio está cerrado en este momento. Intenta nuevamente durante el horario de atención.'
+      );
       onClose();
       return;
     }
@@ -286,7 +288,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
         title="Tratamiento de Datos"
       >
         <div className="space-y-4">
-          <PrivacyContent />
+          <PrivacyContent businessConfig={businessConfig} />
 
           <div className="pt-4 flex justify-end">
             <button
