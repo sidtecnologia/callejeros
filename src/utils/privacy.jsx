@@ -1,50 +1,55 @@
 import React from 'react';
+import { BUSINESS_CONFIG_DEFAULTS } from './ruta-a-tu-archivo-config';
 
-export const PrivacyContent = () => {
-    return (
-        <div className="text-gray-700 leading-relaxed">
-        <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">
+export const PrivacyContent = ({ businessConfig = BUSINESS_CONFIG_DEFAULTS }) => {
+  const name = businessConfig?.name || "nuestro negocio";
+  const address = businessConfig?.address || "nuestra sede";
+  const phone = businessConfig?.phone || businessConfig?.phoneRaw || "nuestras líneas de atención";
+  const email = businessConfig?.email || "soporte@tunegocio.com";
+
+  return (
+    <div className="text-gray-700 leading-relaxed space-y-4">
+      <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
         1. Responsable del Tratamiento de Datos
-        </h2>
-        <p className="mb-4">
-        El responsable del tratamiento de sus datos personales es <strong>Broasted y Pizza Express</strong>, con domicilio en El Socorro, Santander, Colombia. Para cualquier consulta, contáctenos al teléfono: <span className="text-blue-600">573163988393</span>.
-        </p>
+      </h2>
+      <p>
+        El responsable del tratamiento de sus datos personales es <strong>{name}</strong>, con domicilio en {address}. Para ejercer sus derechos sobre sus datos, puede contactarnos al teléfono <span className="text-blue-600">{phone}</span> o al correo electrónico <span className="text-blue-600">{email}</span>.
+      </p>
 
-        <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">
-        2. Datos Recopilados y Finalidad
-        </h2>
-        <p className="mb-2">Recopilamos los siguientes datos:</p>
-        <ul className="list-disc pl-5 mb-4 space-y-1">
-        <li><strong>Nombre:</strong> Para identificar su pedido.</li>
-        <li><strong>Dirección:</strong> Para el envío de su pedido.</li>
-        <li><strong>Detalles del pedido:</strong> Productos, cantidades y precios.</li>
-        <li><strong>Método de pago:</strong> Para la gestión de la transacción.</li>
-        </ul>
+      <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
+        2. Datos Recopilados, Finalidad y Transferencia
+      </h2>
+      <p>Recopilamos nombre, teléfono, dirección y detalles de transacción para:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Procesar, despachar y entregar sus pedidos.</li>
+        <li>Gestionar cobros e informar el estado del domicilio.</li>
+        <li>Compartir con domiciliarios encargados del despacho de la orden.</li>
+      </ul>
 
-        <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">
-        3. Aceptación de la Política de Datos
-        </h2>
-        <p className="mb-4">
-        Al marcar la casilla y finalizar su pedido, usted otorga su <strong>consentimiento inequívoco</strong> para el tratamiento de sus datos.
-        </p>
+      <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
+        3. Autorización y Registro
+      </h2>
+      <p>
+        Al marcar la casilla de aceptación en la PWA y confirmar el pedido, usted otorga su <strong>consentimiento previo, expreso e informado</strong> para el tratamiento de sus datos según esta política.
+      </p>
 
-        <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">
-        4. Derechos del Titular de los Datos
-        </h2>
-        <ul className="list-disc pl-5 mb-4 space-y-1 text-sm">
-        <li>Conocer, actualizar y rectificar sus datos personales.</li>
-        <li>Solicitar prueba de la autorización otorgada.</li>
-        <li>Revocar la autorización o solicitar la supresión de los datos.</li>
-        </ul>
+      <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
+        4. Derechos del Titular (Derechos ARCO)
+      </h2>
+      <p className="text-sm mb-2">Conforme a la Ley 1581 de 2012, usted tiene derecho a:</p>
+      <ul className="list-disc pl-5 space-y-1 text-sm">
+        <li>Conocer, actualizar y rectificar sus datos personales en cualquier momento.</li>
+        <li>Solicitar la supresión de sus datos o revocar la autorización enviando una solicitud a {email}.</li>
+      </ul>
 
-        <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2 mb-4">
+      <h2 className="text-xl font-bold text-green-700 border-b-2 border-gray-100 pb-2">
         5. Seguridad de la Información
-        </h2>
-        <p>
-        Adoptamos medidas técnicas y administrativas para garantizar la seguridad de sus datos, evitando su uso no autorizado.
-        </p>
-        </div>
-    );
+      </h2>
+      <p>
+        Implementamos medidas tecnológicas de seguridad y almacenamiento local seguro en la PWA para evitar el acceso no autorizado a su información.
+      </p>
+    </div>
+  );
 };
 
 export default PrivacyContent;
