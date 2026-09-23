@@ -1,28 +1,48 @@
-import React from 'react';
-import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
+import React, { useEffect, useState } from 'react';
+import { getBusinessConfig } from '../services/api';
 
-export const PrivacyContent = ({
-  businessConfig = BUSINESS_CONFIG_DEFAULTS,
-}) => {
-  const name =
-    businessConfig?.name ||
-    BUSINESS_CONFIG_DEFAULTS.name;
+export const PrivacyContent = ({ businessConfig }) => {
+  const [config, setConfig] = useState(businessConfig || null);
+  const [loading, setLoading] = useState(!businessConfig);
 
-  const address =
-    businessConfig?.address ||
-    BUSINESS_CONFIG_DEFAULTS.address ||
-    'nuestra sede';
+  useEffect(() => {
+    let active = true;
 
-  const phone =
-    businessConfig?.phone ||
-    businessConfig?.phoneRaw ||
-    BUSINESS_CONFIG_DEFAULTS.phone ||
-    'nuestras líneas de atención';
+    const loadConfig = async () => {
+      try {
+        const data = await getBusinessConfig();
 
-  const email =
-    businessConfig?.email ||
-    BUSINESS_CONFIG_DEFAULTS.email ||
-    'correo de contacto';
+        if (active && data) {
+          setConfig(data);
+        }
+      } catch (error) {
+        console.error('Error cargando configuración de privacidad:', error);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadConfig();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const name = config?.name || 'nuestro negocio';
+  const address = config?.address || 'nuestra sede';
+  const phone = config?.phone || config?.phoneRaw || 'nuestras líneas de atención';
+  const email = config?.email || 'correo de contacto';
+
+  if (loading && !config) {
+    return (
+      <div className="py-6 text-center text-gray-500">
+        Cargando información...
+      </div>
+    );
+  }
 
   return (
     <div className="text-gray-700 leading-relaxed space-y-4">

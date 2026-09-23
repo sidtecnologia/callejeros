@@ -63,8 +63,9 @@ const normalizeSchedule = (value) => {
 };
 
 const mapDbToConfig = (row) => ({
-  name: row.name,
+  name: row.name || '',
   description: row.description || '',
+  email: row.email || '',
   phone: row.phone || '',
   phoneRaw: row.phone || '',
   address: row.address || '',
