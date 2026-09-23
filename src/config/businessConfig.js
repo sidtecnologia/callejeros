@@ -2,6 +2,7 @@ export const BUSINESS_CONFIG_DEFAULTS = {
   name: "Mi Negocio",
   description: "",
   phone: "",
+  email: "",
   phoneRaw: "",
   address: "",
   mapsUrl: "",
