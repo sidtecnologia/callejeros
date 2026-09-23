@@ -7,23 +7,23 @@ const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = true })
   useBackGuard(isOpen, onClose);
 
   useEffect(() => {
-  const handleOutsideClick = (e) => {
-    if (disableOutsideClick) return;
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      onClose();
+    const handleOutsideClick = (e) => {
+      if (disableOutsideClick) return;
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.body.style.overflow = 'hidden';
     }
-  };
 
-  if (isOpen) {
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.body.style.overflow = 'hidden';
-  }
-
-  return () => {
-    document.removeEventListener('mousedown', handleOutsideClick);
-    document.body.style.overflow = 'unset';
-  };
-}, [isOpen, onClose, disableOutsideClick]);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose, disableOutsideClick]);
 
   if (!isOpen) return null;
 
@@ -39,7 +39,8 @@ const Modal = ({ isOpen, onClose, title, children, disableOutsideClick = true })
             <X size={24} />
           </button>
         </div>
-        <div className="px-6 pt-6 overflow-y-auto flex-1">
+        
+        <div className="p-6 overflow-y-auto flex-1">
           {children}
         </div>
       </div>
