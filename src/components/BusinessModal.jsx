@@ -206,8 +206,8 @@ const BusinessModal = () => {
 
         <button
           onClick={() => setBusinessModalOpen(false)}
-          className="w-full py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition-colors"
-        >
+          className="w-full py-3 mb-6 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition-colors"
+>       
           Entendido
         </button>
       </div>
