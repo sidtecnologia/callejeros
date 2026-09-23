@@ -1,5 +1,5 @@
 import React from 'react';
-import { BUSINESS_CONFIG_DEFAULTS } from './ruta-a-tu-archivo-config';
+import { BUSINESS_CONFIG_DEFAULTS } from './config/businessConfig';
 
 export const PrivacyContent = ({ businessConfig = BUSINESS_CONFIG_DEFAULTS }) => {
   const name = businessConfig?.name || "nuestro negocio";
