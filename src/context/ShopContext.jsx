@@ -1,10 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import {
-  getProducts,
-  validateOrderAPI,
-  saveOrderToDB,
-  getBusinessConfig
-} from '../services/api';
+import { getProducts, validateOrderAPI, saveOrderToDB, getBusinessConfig } from '../services/api';
 import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
 
 const ShopContext = createContext();
@@ -65,33 +60,6 @@ const normalizeSchedule = (value) => {
 
     return schedule;
   }, { ...EMPTY_SCHEDULE });
-};
-
-const getProductCategory = (product) => {
-  if (!product) return null;
-
-  const category =
-    product.category ??
-    product.category_name ??
-    product.categoryName ??
-    product.categoria ??
-    null;
-
-  if (typeof category === 'string') {
-    return category.trim() || null;
-  }
-
-  if (category && typeof category === 'object') {
-    return (
-      category.name ??
-      category.title ??
-      category.nombre ??
-      category.label ??
-      null
-    );
-  }
-
-  return null;
 };
 
 const mapDbToConfig = (row) => ({
@@ -208,7 +176,6 @@ export const ShopProvider = ({ children }) => {
           price: size ? size.price : product.price,
           size: size ? size.label : null,
           observation: observation || '',
-          category: getProductCategory(product),
         },
       ];
     });
