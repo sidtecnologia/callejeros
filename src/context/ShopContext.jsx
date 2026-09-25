@@ -94,17 +94,6 @@ const getProductCategory = (product) => {
   return null;
 };
 
-const getProductCategoryId = (product) => {
-  if (!product) return null;
-
-  return (
-    product.category_id ??
-    product.categoryId ??
-    product.categoria_id ??
-    null
-  );
-};
-
 const mapDbToConfig = (row) => ({
   name: row.name || '',
   description: row.description || '',
@@ -136,9 +125,7 @@ export const ShopProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isBusinessModalOpen, setBusinessModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
-  const [businessConfig, setBusinessConfig] = useState(
-    BUSINESS_CONFIG_DEFAULTS
-  );
+  const [businessConfig, setBusinessConfig] = useState(BUSINESS_CONFIG_DEFAULTS);
 
   useEffect(() => {
     fetchAll();
@@ -166,15 +153,8 @@ export const ShopProvider = ({ children }) => {
   };
 
   const addToast = (message, title = '') => {
-    const id =
-      Date.now().toString() +
-      Math.random().toString(36).slice(2, 9);
-
-    const toast = {
-      id,
-      title,
-      message,
-    };
+    const id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
+    const toast = { id, title, message };
 
     setToasts((prev) => [toast, ...prev]);
 
@@ -187,26 +167,15 @@ export const ShopProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const addToCart = (
-    product,
-    qty,
-    observation = '',
-    size = null
-  ) => {
+  const addToCart = (product, qty, observation = '', size = null) => {
     let limitReached = false;
-
-    const category = getProductCategory(product);
-    const categoryId = getProductCategoryId(product);
 
     setCart((prevCart) => {
       const cartKey = size
         ? `${product.id}__${size.label}`
         : String(product.id);
 
-      const existing = prevCart.find(
-        (item) => item._cartKey === cartKey
-      );
-
+      const existing = prevCart.find((item) => item._cartKey === cartKey);
       const currentQty = existing ? existing.qty : 0;
 
       if (currentQty + qty > product.stock) {
@@ -239,16 +208,13 @@ export const ShopProvider = ({ children }) => {
           price: size ? size.price : product.price,
           size: size ? size.label : null,
           observation: observation || '',
-          category,
-          category_id: categoryId,
+          category: getProductCategory(product),
         },
       ];
     });
 
     if (limitReached) {
-      alert(
-        `Solo quedan ${product.stock} unidades disponibles.`
-      );
+      alert(`Solo quedan ${product.stock} unidades disponibles.`);
     } else {
       addToast(
         `${product.name}${size ? ` (${size.label})` : ''} agregado al carrito.`,
@@ -266,18 +232,11 @@ export const ShopProvider = ({ children }) => {
   const updateCartQty = (cartKey, delta) => {
     let limitReached = false;
 
-    const cartItem = cart.find(
-      (i) => i._cartKey === cartKey
-    );
-
-    const product = products.find(
-      (p) => p.id === cartItem?.id
-    );
+    const cartItem = cart.find((i) => i._cartKey === cartKey);
+    const product = products.find((p) => p.id === cartItem?.id);
 
     setCart((prevCart) => {
-      const item = prevCart.find(
-        (i) => i._cartKey === cartKey
-      );
+      const item = prevCart.find((i) => i._cartKey === cartKey);
 
       if (!item || !product) return prevCart;
 
@@ -289,25 +248,18 @@ export const ShopProvider = ({ children }) => {
       }
 
       if (newQty <= 0) {
-        return prevCart.filter(
-          (i) => i._cartKey !== cartKey
-        );
+        return prevCart.filter((i) => i._cartKey !== cartKey);
       }
 
       return prevCart.map((i) =>
         i._cartKey === cartKey
-          ? {
-              ...i,
-              qty: newQty,
-            }
+          ? { ...i, qty: newQty }
           : i
       );
     });
 
     if (limitReached) {
-      alert(
-        `Solo quedan ${product?.stock} unidades disponibles.`
-      );
+      alert(`Solo quedan ${product?.stock} unidades disponibles.`);
     }
   };
 
@@ -341,43 +293,10 @@ export const ShopProvider = ({ children }) => {
         size: item.size || null,
         observation: item.observation || '',
         category: item.category || null,
-        category_id: item.category_id || null,
       })),
     };
 
     const result = await validateOrderAPI(orderPayload);
-
-    const validatedItems = Array.isArray(result.validatedItems)
-      ? result.validatedItems
-      : [];
-
-    const itemsWithCategory = validatedItems.map((validatedItem) => {
-      const originalItem = cart.find(
-        (item) =>
-          String(item.id) === String(validatedItem.id) &&
-          (
-            item.size || null
-          ) === (
-            validatedItem.size || null
-          )
-      );
-
-      return {
-        ...validatedItem,
-        category:
-          validatedItem.category ??
-          validatedItem.category_name ??
-          validatedItem.categoryName ??
-          validatedItem.categoria ??
-          originalItem?.category ??
-          null,
-        category_id:
-          validatedItem.category_id ??
-          validatedItem.categoryId ??
-          originalItem?.category_id ??
-          null,
-      };
-    });
 
     return {
       name: result.customerData.name,
@@ -385,7 +304,7 @@ export const ShopProvider = ({ children }) => {
       phone: result.customerData.phone,
       payment: result.customerData.payment,
       observation: result.customerData.observation || '',
-      items: itemsWithCategory,
+      items: result.validatedItems,
       total: result.total,
     };
   };
