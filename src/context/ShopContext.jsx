@@ -271,7 +271,15 @@ export const ShopProvider = ({ children }) => {
       phone: result.customerData.phone,
       payment: result.customerData.payment,
       observation: result.customerData.observation || '',
-      items: result.validatedItems,
+      items: result.validatedItems.map((vItem) => {
+        const cItem = cart.find(
+          (c) => c.id === vItem.id && c.size === vItem.size
+        );
+        return {
+          ...vItem,
+          category: cItem?.category || null,
+        };
+      }),
       total: result.total,
     };
   };
