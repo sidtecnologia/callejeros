@@ -6,6 +6,8 @@ const ShopContext = createContext();
 
 export const useShop = () => useContext(ShopContext);
 
+const DEFAULT_ORDER_TYPE = 'Para llevar';
+
 const EMPTY_SCHEDULE = {
   mon: [],
   tue: [],
@@ -233,6 +235,8 @@ export const ShopProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   const processOrder = async (customerData) => {
+    const orderType = customerData.orderType || DEFAULT_ORDER_TYPE;
+
     const itemObservations = cart
       .map((i) =>
         i.observation && i.observation.trim()
@@ -251,6 +255,7 @@ export const ShopProvider = ({ children }) => {
       address: customerData.address,
       phone: customerData.phone,
       payment: customerData.payment,
+      orderType,
       observation: aggregatedObservation,
       items: cart.map((item) => ({
         id: item.id,
@@ -270,6 +275,7 @@ export const ShopProvider = ({ children }) => {
       address: result.customerData.address,
       phone: result.customerData.phone,
       payment: result.customerData.payment,
+      orderType,
       observation: result.customerData.observation || '',
       items: result.validatedItems.map((vItem) => {
         const cItem = cart.find(
@@ -293,6 +299,7 @@ export const ShopProvider = ({ children }) => {
       total_amount: orderDetails.total,
       order_items: orderDetails.items,
       observation: orderDetails.observation || null,
+      order_type: orderDetails.orderType || DEFAULT_ORDER_TYPE,
       order_status: 'Recibido',
       payment_status: 'Pendiente',
     };
