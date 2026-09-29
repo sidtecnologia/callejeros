@@ -1,66 +1,100 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Modal from './ui/Modal';
 import { useShop } from '../context/ShopContext';
 import { useStoreHours } from '../hooks/useStoreHours';
 import PrivacyContent from '../utils/privacy';
 import ConfirmarPedidoYPagoModal from './ConfirmarPedidoYPagoModal';
 
+const PICKUP_ADDRESS = 'Recoger en el local';
+
+const INITIAL_FORM = {
+  name: '',
+  address: '',
+  phone: '',
+  orderType: 'Para llevar',
+  payment: 'Efectivo',
+  terms: false,
+};
+
+const ORDER_TYPES = ['Para llevar', 'Para recoger'];
+const PAYMENT_METHODS = ['Efectivo', 'Transferencia'];
+
 const sanitize = (value, max) =>
   value.trim().slice(0, max).replace(/[<>]/g, '');
+
+const inputClass = (hasError) =>
+  `w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
+    hasError ? 'border-red-400' : 'border-gray-300'
+  }`;
+
+const validate = ({ name, address, phone, orderType, terms }) => {
+  const errors = {};
+
+  if (name.trim().length < 3) {
+    errors.name = 'Ingresa tu nombre completo';
+  }
+
+  if (orderType === 'Para llevar' && address.trim().length < 5) {
+    errors.address = 'Ingresa una dirección válida';
+  }
+
+  if (!/^\d{7,15}$/.test(phone.replace(/\s/g, ''))) {
+    errors.phone = 'Ingresa un número de WhatsApp válido';
+  }
+
+  if (!terms) {
+    errors.terms = 'Debes aceptar los términos y condiciones';
+  }
+
+  return errors;
+};
+
+const Field = ({ label, error, children }) => (
+  <div>
+    <label className="block text-sm font-semibold mb-1 text-gray-700">
+      {label}
+    </label>
+    {children}
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+  </div>
+);
+
+const RadioOption = ({ name, value, checked, onChange }) => (
+  <label
+    className={`flex items-center gap-2 p-3 border rounded-xl flex-1 cursor-pointer hover:bg-gray-50 ${
+      checked ? 'border-primary bg-gray-50' : ''
+    }`}
+  >
+    <input
+      type="radio"
+      name={name}
+      value={value}
+      checked={checked}
+      onChange={(e) => onChange(e.target.value)}
+      className="accent-primary"
+    />
+    <span>{value}</span>
+  </label>
+);
 
 const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
   const { processOrder, businessConfig } = useShop();
   const isStoreOpen = useStoreHours();
 
   const [loading, setLoading] = useState(false);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    payment: 'Efectivo',
-    terms: false,
-  });
-
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [errors, setErrors] = useState({});
   const [isPrivacyOpen, setPrivacyOpen] = useState(false);
   const [transferOrder, setTransferOrder] = useState(null);
-  const [errors, setErrors] = useState({});
 
-  const validate = () => {
-    const newErrors = {};
+  const isPickup = formData.orderType === 'Para recoger';
 
-    if (!formData.name.trim() || formData.name.trim().length < 3) {
-      newErrors.name = 'Ingresa tu nombre completo';
-    }
-
-    if (!formData.address.trim() || formData.address.trim().length < 5) {
-      newErrors.address = 'Ingresa una dirección válida';
-    }
-
-    if (!/^\d{7,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Ingresa un número de WhatsApp válido';
-    }
-
-    if (!formData.terms) {
-      newErrors.terms = 'Debes aceptar los términos y condiciones';
-    }
-
-    return newErrors;
-  };
-
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: undefined,
-      }));
-    }
-  };
+  const handleChange = useCallback((field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) =>
+      prev[field] ? { ...prev, [field]: undefined } : prev
+    );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,8 +107,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
-    const validationErrors = validate();
-
+    const validationErrors = validate(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -83,20 +116,18 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
-      const sanitizedData = {
+      const details = await processOrder({
         ...formData,
         name: sanitize(formData.name, 100),
-        address: sanitize(formData.address, 200),
+        address: isPickup ? PICKUP_ADDRESS : sanitize(formData.address, 200),
         phone: formData.phone.replace(/\s/g, '').slice(0, 15),
-      };
+      });
 
-      const details = await processOrder(sanitizedData);
+      onClose();
 
-      if (sanitizedData.payment === 'Transferencia') {
+      if (formData.payment === 'Transferencia') {
         setTransferOrder(details);
-        onClose();
       } else {
-        onClose();
         onSuccess(details);
       }
     } catch (error) {
@@ -108,129 +139,82 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title="Datos de Entrega"
-      >
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-          noValidate
-        >
+      <Modal isOpen={isOpen} onClose={onClose} title="Datos de Entrega">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">
-              Nombre Completo
+            <label className="block text-sm font-semibold mb-2 text-gray-700">
+              Tipo de Pedido
             </label>
+            <div className="flex gap-4">
+              {ORDER_TYPES.map((type) => (
+                <RadioOption
+                  key={type}
+                  name="orderType"
+                  value={type}
+                  checked={formData.orderType === type}
+                  onChange={(v) => handleChange('orderType', v)}
+                />
+              ))}
+            </div>
+          </div>
 
+          <Field label="Nombre Completo" error={errors.name}>
             <input
-              required
               type="text"
               maxLength={100}
-              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
-                errors.name ? 'border-red-400' : 'border-gray-300'
-              }`}
+              className={inputClass(errors.name)}
               placeholder="Juan Pérez"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
             />
+          </Field>
 
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.name}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">
-              WhatsApp
-            </label>
-
+          <Field label="WhatsApp" error={errors.phone}>
             <input
-              required
               type="tel"
               maxLength={15}
               inputMode="numeric"
-              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
-                errors.phone ? 'border-red-400' : 'border-gray-300'
-              }`}
+              className={inputClass(errors.phone)}
               placeholder="3001234567"
               value={formData.phone}
               onChange={(e) =>
-                handleChange(
-                  'phone',
-                  e.target.value.replace(/[^\d\s]/g, '')
-                )
+                handleChange('phone', e.target.value.replace(/[^\d\s]/g, ''))
               }
             />
+          </Field>
 
-            {errors.phone && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.phone}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">
-              Dirección de Entrega
-            </label>
-
-            <input
-              required
-              type="text"
-              maxLength={200}
-              className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition ${
-                errors.address ? 'border-red-400' : 'border-gray-300'
-              }`}
-              placeholder="Calle 123 # 45-67 Barrio"
-              value={formData.address}
-              onChange={(e) =>
-                handleChange('address', e.target.value)
-              }
-            />
-
-            {errors.address && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.address}
-              </p>
-            )}
-          </div>
+          {isPickup ? (
+            <p className="text-sm text-gray-600 bg-gray-50 border rounded-xl p-3">
+              Recogerás tu pedido en el local
+              {businessConfig?.address ? `: ${businessConfig.address}` : '.'}
+            </p>
+          ) : (
+            <Field label="Dirección de Entrega" error={errors.address}>
+              <input
+                type="text"
+                maxLength={200}
+                className={inputClass(errors.address)}
+                placeholder="Calle 123 # 45-67 Barrio"
+                value={formData.address}
+                onChange={(e) => handleChange('address', e.target.value)}
+              />
+            </Field>
+          )}
 
           <div>
             <label className="block text-sm font-semibold mb-2 text-gray-700">
               Método de Pago
             </label>
-
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 p-3 border rounded-xl flex-1 cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
+              {PAYMENT_METHODS.map((method) => (
+                <RadioOption
+                  key={method}
                   name="payment"
-                  value="Efectivo"
-                  checked={formData.payment === 'Efectivo'}
-                  onChange={(e) =>
-                    handleChange('payment', e.target.value)
-                  }
-                  className="accent-primary"
+                  value={method}
+                  checked={formData.payment === method}
+                  onChange={(v) => handleChange('payment', v)}
                 />
-                <span>Efectivo</span>
-              </label>
-
-              <label className="flex items-center gap-2 p-3 border rounded-xl flex-1 cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="Transferencia"
-                  checked={formData.payment === 'Transferencia'}
-                  onChange={(e) =>
-                    handleChange('payment', e.target.value)
-                  }
-                  className="accent-primary"
-                />
-                <span>Transferencia</span>
-              </label>
+              ))}
             </div>
           </div>
 
@@ -238,18 +222,11 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
             <input
               id="terms"
               type="checkbox"
-              required
               checked={formData.terms}
-              onChange={(e) =>
-                handleChange('terms', e.target.checked)
-              }
+              onChange={(e) => handleChange('terms', e.target.checked)}
               className="w-5 h-5 accent-primary rounded"
             />
-
-            <label
-              htmlFor="terms"
-              className="text-sm text-gray-600"
-            >
+            <label htmlFor="terms" className="text-sm text-gray-600">
               Acepto el{' '}
               <button
                 type="button"
@@ -263,9 +240,7 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {errors.terms && (
-            <p className="text-red-500 text-xs -mt-2">
-              {errors.terms}
-            </p>
+            <p className="text-red-500 text-xs -mt-2">{errors.terms}</p>
           )}
 
           <button
@@ -289,7 +264,6 @@ const CheckoutModal = ({ isOpen, onClose, onSuccess }) => {
       >
         <div className="space-y-4">
           <PrivacyContent businessConfig={businessConfig} />
-
           <div className="pt-4 flex justify-end">
             <button
               onClick={() => setPrivacyOpen(false)}
