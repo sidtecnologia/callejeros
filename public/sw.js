@@ -2,7 +2,7 @@ try {
   importScripts('/sp-push-worker-fb.js');
 } catch (e) { }
 
-const CACHE_NAME = 'coco-v1.0.0'
+const CACHE_NAME = 'callejeros-v1.0.0'
 const ASSETS = [
   '/',
   '/index.html',
@@ -61,7 +61,7 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notificación', body: event.data ? event.data.text() : 'Tienes una nueva notificación' };
   }
 
-  const title = payload.title || 'coco-burger';
+  const title = payload.title || 'callejeros-socorro';
   const options = {
     body: payload.body || '',
     icon: payload.icon || 'img/favicon.png',

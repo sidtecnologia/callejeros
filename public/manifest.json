@@ -1,11 +1,11 @@
 {
-  "name": "Coco Burguer Menu",
-  "short_name": "Coco Burguer",
+  "name": "Callejeros Socorro Menu",
+  "short_name": "Callejeros Socorro",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#dc2626",
-  "description": "Descubre el menú digital de Coco Burguer en Barrancabermeja.",
+  "description": "Descubre el menú digital de Callejeros Socorro.",
   "icons": [
     {
       "src": "img/favicon.png",
