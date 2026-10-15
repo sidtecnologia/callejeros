@@ -62,7 +62,10 @@ const normalizeSchedule = (shifts) => {
   if (typeof shifts !== 'object') return empty;
 
   return DAYS.reduce((result, day) => {
-    const dayShifts = Array.isArray(shifts[day]) ? shifts[day] : [];
+    const dayObj = shifts[day];
+    const dayShifts = Array.isArray(dayObj)
+      ? dayObj
+      : (dayObj && Array.isArray(dayObj.shifts) ? dayObj.shifts : []);
 
     result[day] = dayShifts
       .filter(Boolean)
@@ -82,7 +85,6 @@ const getZonedDateParts = (date, timezone) => {
   });
 
   const parts = formatter.formatToParts(date);
-
   const values = {};
 
   parts.forEach((part) => {

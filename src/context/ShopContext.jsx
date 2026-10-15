@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getProducts, validateOrderAPI, saveOrderToDB, getBusinessConfig } from '../services/api';
-import { BUSINESS_CONFIG_DEFAULTS } from '../config/businessConfig';
 
 const ShopContext = createContext();
 
@@ -54,7 +53,10 @@ const normalizeSchedule = (value) => {
   }
 
   return Object.keys(EMPTY_SCHEDULE).reduce((schedule, day) => {
-    const dayShifts = Array.isArray(value[day]) ? value[day] : [];
+    const dayObj = value[day];
+    const dayShifts = Array.isArray(dayObj)
+      ? dayObj
+      : (dayObj && Array.isArray(dayObj.shifts) ? dayObj.shifts : []);
 
     schedule[day] = dayShifts
       .map(normalizeShift)
@@ -349,4 +351,31 @@ export const ShopProvider = ({ children }) => {
       {children}
     </ShopContext.Provider>
   );
+};
+
+export const BUSINESS_CONFIG_DEFAULTS = {
+  name: "Mi Negocio",
+  description: "",
+  phone: "",
+  email: "",
+  phoneRaw: "",
+  address: "",
+  mapsUrl: "",
+  whatsapp: "",
+  nequi: { number: "", qrUrl: "" },
+  delivery: { cost: 0 },
+  banners: [],
+  schedule: {
+    label: "Lunes a Domingo: 8:00 am - 8:00 pm",
+    shifts: {
+      mon: { shifts: [{ open: "08:00", close: "20:00" }] },
+      tue: { shifts: [{ open: "08:00", close: "20:00" }] },
+      wed: { shifts: [{ open: "08:00", close: "20:00" }] },
+      thu: { shifts: [{ open: "08:00", close: "20:00" }] },
+      fri: { shifts: [{ open: "08:00", close: "20:00" }] },
+      sat: { shifts: [{ open: "08:00", close: "20:00" }] },
+      sun: { shifts: [{ open: "08:00", close: "20:00" }] }
+    },
+    timezone: "America/Bogota",
+  },
 };
