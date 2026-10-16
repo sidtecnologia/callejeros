@@ -223,15 +223,27 @@ const StoreContent = () => {
       </main>
 
       <footer className="bg-white border-t mt-8 py-6 text-center text-gray-500 text-xs">
-        <button
-          onClick={() => {
-            setBusinessModalOpen(true);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 mb-3 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
-        >
-          <Info size={16} />
-          <span className="font-medium">Ver información del negocio</span>
-        </button>
+        <div className="flex flex-col items-center justify-center gap-2 mb-3">
+          <button
+            onClick={() => {
+              setBusinessModalOpen(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
+          >
+            <Info size={16} />
+            <span className="font-medium">Ver información del negocio</span>
+          </button>
+          <a
+            href={`https://wa.me/573204792614?text=${encodeURIComponent(
+              `Hola, soy dueño de ${businessConfig?.name ? `${businessConfig.name}` : ''}. Quiero ponerme en contacto con los desarrolladores y reclamar el negocio.`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-300 rounded-lg transition-colors"
+          >
+            <span className="font-medium">¿Eres propietario?</span>
+          </a>
+        </div>
         <p>&copy; {new Date().getFullYear()} TECSIN. Todos los derechos reservados.</p>
       </footer>
 
